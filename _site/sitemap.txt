@@ -1,0 +1,13 @@
+
+http://rinvay.github.io/404.html
+http://rinvay.github.io/about.html
+http://rinvay.github.io/archive.html
+http://rinvay.github.io/atom.xml
+http://rinvay.github.io/categories.html
+http://rinvay.github.io/index.html
+http://rinvay.github.io/rss.xml
+http://rinvay.github.io/search.html
+http://rinvay.github.io/sitemap.txt
+http://rinvay.github.io/tags.html
+
+http://rinvay.github.io/android/2015/03/26/Gradle-Plugin-User-Guide(Translation)

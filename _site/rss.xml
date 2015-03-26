@@ -1,0 +1,1957 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+        <title>Rinvay's Blog</title>
+        <description>Rinvay's Blog - Rinvay Tang</description>
+        <link>http://rinvay.github.io</link>
+        <link>http://rinvay.github.io</link>
+        <lastBuildDate>2015-03-27T01:18:08+08:00</lastBuildDate>
+        <pubDate>2015-03-27T01:18:08+08:00</pubDate>
+        <ttl>1800</ttl>
+
+
+        <item>
+                <title>Gradle插件用户指南(译)</title>
+                <description>&lt;blockquote&gt;
+  &lt;p&gt;原文&lt;a href=&quot;http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Introduction&quot;&gt;Gradle Plugin User Guide - Android Tools Project Site&lt;/a&gt;&lt;br /&gt;
+samples see bottom of &lt;a href=&quot;http://tools.android.com/tech-docs/new-build-system&quot;&gt;New Build System&lt;/a&gt;&lt;br /&gt;
+参考&lt;a href=&quot;http://www.gradleware.com/services/training/gradle-for-android-training-course/&quot;&gt;Gradle For Android Training Course&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;1 简介&lt;/h2&gt;
+
+&lt;p&gt;这篇文档是基于0.9版本的Gradle插件，1.0以前的版本由于不兼容，可能会有所不同&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;1.1 新的构建系统的目标&lt;/h3&gt;
+
+&lt;p&gt;新构建系统的目标是：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;使得代码和资源的重用更加简单&lt;/li&gt;
+  &lt;li&gt;使得创建同一应用程序的不同版本更加容易，不管是多个apk版本还是同一版本的多种定制&lt;/li&gt;
+  &lt;li&gt;使得配置，扩展和自定义构建更加容易&lt;/li&gt;
+  &lt;li&gt;良好的IDE集成&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;gradle&quot;&gt;1.2 为什么使用Gradle&lt;/h3&gt;
+
+&lt;p&gt;Gradle是一个高级构建系统和构建工具，允许通过插件自定义构建逻辑&lt;/p&gt;
+
+&lt;p&gt;以下一些功能使得我们选择Gradle：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;使用特定领域语言(DSL)来描述和控制构建逻辑&lt;/li&gt;
+  &lt;li&gt;构建脚本基于Groovy语言，允许通过DSL混合元素声明和通过代码控制DSL元素，来产生自定义的构建逻辑&lt;/li&gt;
+  &lt;li&gt;支持Maven和(或者)Ivy管理依赖&lt;/li&gt;
+  &lt;li&gt;非常灵活。允许使用最佳实践，但也不强制自己的实现方式&lt;/li&gt;
+  &lt;li&gt;插件能够提供自己的DSL和API供构建脚本使用&lt;/li&gt;
+  &lt;li&gt;提供优秀的工具API以供IDE集成&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;section-2&quot;&gt;2 环境要求&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Gradle 1.10或者1.11或者1.12，以及插件版本0.11.1&lt;/li&gt;
+  &lt;li&gt;SDK以及Buid Tools 19.0.0，某些功能可能需要更新的版本&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;section-3&quot;&gt;3 基本项目&lt;/h2&gt;
+
+&lt;p&gt;Gradle项目通过项目根目录下的 build.gradle 文件来描述构建过程&lt;/p&gt;
+
+&lt;h3 id=&quot;section-4&quot;&gt;3.1 简单的构建文件&lt;/h3&gt;
+
+&lt;p&gt;最简单的Java项目构建文件 build.gradle&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;
+apply plugin: &#39;java&#39;
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;这个脚本应用了Gradle的Java插件。这个插件了提供构建和测试Java应用的所有功能&lt;/p&gt;
+
+&lt;p&gt;最简单的Android项目的构建文件包含以下内容：    &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath &#39;com.android.tools.build:gradle:0.11.1&#39;
+    }
+}
+
+apply plugin: &#39;android&#39;
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion &quot;19.0.0&quot;
+}    
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Note(译注):&lt;/strong&gt; 最新的android插件声明&lt;br /&gt;
+&lt;code&gt;apply plugin: &#39;com.android.application&#39;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;在这个Android构建脚本里包含了三个主要内容：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;buildscript { ... }&lt;/code&gt;&lt;/strong&gt; 配置了驱动构建过程的代码。在这个案例中，声明了使用Maven仓库，以及一个Maven文件(artifact)的依赖路径。这个文件就是包含了Android Gradle插件的库，版本为0.11.1&lt;/p&gt;
+
+&lt;p&gt;然后，&lt;strong&gt;&lt;code&gt;android&lt;/code&gt;&lt;/strong&gt;插件被应用，像之前的Java插件一样&lt;/p&gt;
+
+&lt;p&gt;最后，&lt;strong&gt;&lt;code&gt;android { ... }&lt;/code&gt;&lt;/strong&gt; 配置了anroid构建过程需要的参数。这也是Adnroid DSL的入口。默认的情况下，只有编译目标SDK版本，和构建工具版本是必须的。在脚本中，对应的是&lt;code&gt;compileSdkVersion&lt;/code&gt;和&lt;code&gt;buildtoolsVersion&lt;/code&gt;属性。&lt;code&gt;compileSdkVersion&lt;/code&gt;和旧编译系统中&lt;code&gt;project.properties&lt;/code&gt;文件中的&lt;code&gt;target&lt;/code&gt;属性对应。这个新属性&lt;code&gt;compileSdkVersion&lt;/code&gt;可以是一个int值(API Level)或者一个和之前的&lt;code&gt;target&lt;/code&gt;属性值一样的字符串&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;重点:&lt;/strong&gt; 你应该只应用android插件，同时应用java插件会导致构建错误&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意:&lt;/strong&gt; 你同样需要一个&lt;code&gt;local.properties&lt;/code&gt;文件来指明SDK的路径，和&lt;code&gt;build.gradle&lt;/code&gt;在同一路径下，在文件中使用&lt;code&gt;sdk.dir&lt;/code&gt;属性指明。或者，你可以设置&lt;code&gt;ANDROID_HOME&lt;/code&gt;环境变量。两者是一致的，你可以选择一种你喜欢的方式。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-5&quot;&gt;3.2 项目结构&lt;/h3&gt;
+
+&lt;p&gt;前面的android构建脚本使用了默认的文件夹目录结构。Gradle遵循&lt;code&gt;约定优于配置&lt;/code&gt;的原则，在可能的情况下提供了合理的默认配置参数。&lt;/p&gt;
+
+&lt;p&gt;基本的项目包含两个“source sets”组件。&lt;code&gt;main source code&lt;/code&gt;和&lt;code&gt;test code&lt;/code&gt;，位于以下的目录中：&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;
+src/main/
+src/androidTest/
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;在这些目录中，都存在目录对应源码组件&lt;/p&gt;
+
+&lt;p&gt;不管是Java还是Android插件，源码目录和资源目录都如下 ：&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;
+java/
+resources/
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;对于Android插件，还有特有的文件和目录&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;
+AndroidManifest.xml
+res/
+assets/
+aidl/
+rs/
+jni/
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; &lt;code&gt;src/androidTest/AndroidManifest.xml&lt;/code&gt; 不是必须的，会自动被创建。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-6&quot;&gt;3.2.1 配置项目结构&lt;/h4&gt;
+
+&lt;p&gt;当默认项目结构不合适的时候，可以配置项目目录。根据Gradle文档，可以通过下面的脚本重新配置Java项目的sourceSets：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sourceSets {
+    main {
+        java {
+            srcDir &#39;src/java&#39;
+        }
+        resources {
+            srcDir &#39;src/resources&#39;
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; srcDir 会添加指定的目录到源文件目录列表中(这在Gradele文档中没有提及，但是实际上是这样的)。&lt;/p&gt;
+
+&lt;p&gt;为了替换默认的源文件目录列表，可以使用&lt;code&gt;srcDirs&lt;/code&gt;来指定目录数组。这也是一种不同的使用方式：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sourceSets {
+    main.java.srcDirs = [&#39;src/java&#39;]
+    main.resources.srcDirs = [&#39;src/resources&#39;]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;更多的信息，参考Gradle文档中的Java插件&lt;a href=&quot;http://gradle.org/docs/current/userguide/java_plugin.html&quot;&gt;内容&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Android插件使用相似的语法，但是由于使用是自己的&lt;code&gt;sourceSets&lt;/code&gt;，相应的目录在(&lt;code&gt;build.gradle&lt;/code&gt;文件中的)android对象中指定&lt;/p&gt;
+
+&lt;p&gt;下面是一个示例，它使用旧项目的源码结构，并且将androidTest sourceSet映射到tests目录&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    sourceSets {
+        main {
+            manifest.srcFile &#39;AndroidManifest.xml&#39;
+            
+            java.srcDirs = [&#39;src&#39;]
+            
+            resources.srcDirs = [&#39;src&#39;]
+            
+            aidl.srcDirs = [&#39;src&#39;]
+            renderscript.srcDirs = [&#39;src&#39;]
+            
+            res.srcDirs = [&#39;res&#39;]
+            assets.srcDirs = [&#39;assets&#39;]
+        }
+
+        androidTest.setRoot(&#39;tests&#39;)
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; 由于旧的结构将所有的源文件 (java, aidl, renderscript, and java资源文件)放在一个目录里，我们需要映射这些sourceSet组件到src目录。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; setRoot() 方法将整个sourceSet(包含子目录)指向新的目录。比如上面，将&lt;code&gt;src/androidTest/*&lt;/code&gt; 指向了 &lt;code&gt;tests/*&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;以上是Android特有的，如果配置在Java sourceSets中就没有作用&lt;/p&gt;
+
+&lt;p&gt;‘migrated’ 示例(位于&lt;a href=&quot;http://tools.android.com/tech-docs/new-build-system/&quot;&gt;本页面&lt;/a&gt;底部)中展示了这部分内容&lt;/p&gt;
+
+&lt;h3 id=&quot;section-7&quot;&gt;3.3 构建任务&lt;/h3&gt;
+
+&lt;h4 id=&quot;section-8&quot;&gt;3.3.1 通用任务&lt;/h4&gt;
+
+&lt;p&gt;在build文件中应用一个插件将自动创建一系列构建任务。Java插件和Android插件都是这样。任务约定如下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;assemble&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;组合项目输出&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;check&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;执行所有检查&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;build&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;执行assemble和check两个task的所有工作&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;clean  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;清理项目输出&lt;/p&gt;
+
+&lt;p&gt;任务&lt;code&gt;assemble&lt;/code&gt;, &lt;code&gt;check&lt;/code&gt; 和 &lt;code&gt;build&lt;/code&gt; 不会做任何实际的事情。他们只是锚点任务(anchor tasks)，插件依赖他们来添加实际执行实际操作的任务。&lt;/p&gt;
+
+&lt;p&gt;这样就不需要考虑项目是什么类型，使用的是什么插件，都可以执行同样的任务。&lt;br /&gt;
+例如，使用findbugs插件，会创建新的任务，并让&lt;code&gt;check&lt;/code&gt;依赖这个任务，使得&lt;code&gt;check&lt;/code&gt;被调用时这个任务就会被调用。&lt;/p&gt;
+
+&lt;p&gt;在终端(命令行，gradle项目目录下)中运行下面的任务可以查询到高级别的任务：&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;
+gradle tasks
+&lt;/code&gt;
+运行以下命令可以看到全部任务和任务依赖关系：&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;
+gradle tasks --all
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Gradle自动监视一个任务声明的输入输出文件。再次执行构建任务时，如果文件没有改变，Gradle会指明所有任务为&lt;code&gt;UP-TO-DATE&lt;/code&gt;，意味着任务不需要执行。这样的话，任务可以正确地互相依赖，而不不会导致非必须的构建操作&lt;/p&gt;
+
+&lt;h4 id=&quot;java&quot;&gt;3.3.2 Java项目的任务&lt;/h4&gt;
+
+&lt;p&gt;Java插件主要创建两个任务，下面是这两个锚点任务的依赖关系&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;assemble
+    &lt;ul&gt;
+      &lt;li&gt;jar  &lt;br /&gt;
+  这个任务创建输出&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;check
+    &lt;ul&gt;
+      &lt;li&gt;test   &lt;br /&gt;
+  这个任务运行测试&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;jar&lt;/code&gt;任务直接或间接地依赖其他任务：例如&lt;code&gt;classes&lt;/code&gt;任务将编译Java源码&lt;br /&gt;
+&lt;code&gt;testClasses&lt;/code&gt;任务用于编译测试的，但是这个任务很少被调用，因为&lt;code&gt;test&lt;/code&gt;任务依赖于它(就像依赖&lt;code&gt;classes&lt;/code&gt;任务一样)&lt;/p&gt;
+
+&lt;p&gt;通常来说，你只需要调用&lt;code&gt;assemble&lt;/code&gt;或者&lt;code&gt;check&lt;/code&gt;任务，而不需要调用其他任务。&lt;/p&gt;
+
+&lt;p&gt;你可以在&lt;a href=&quot;http://gradle.org/docs/current/userguide/java_plugin.html&quot;&gt;Gradle Java插件文档&lt;/a&gt;看到Java插件的全部任务和它们的描述&lt;/p&gt;
+
+&lt;h4 id=&quot;android&quot;&gt;3.3.3 Android任务&lt;/h4&gt;
+
+&lt;p&gt;Android插件使用同样的约定来保持和其他插件的兼容，并且添加了额外的锚点任务：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;assemble&lt;br /&gt;
+这个任务组织项目的输出&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;check&lt;br /&gt;
+这个项目运行所有检查&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;connectedCheck&lt;br /&gt;
+运行检查需要一个已连接的设备或者模拟器。并在所有已连接的设备上异步运行。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;deviceCheck&lt;br /&gt;
+通过APIs连接远程设备并运行检查。这通常在CI服务器上运行。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;build&lt;br /&gt;
+运行&lt;code&gt;assemble&lt;/code&gt;和&lt;code&gt;check&lt;/code&gt; &lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;clean&lt;br /&gt;
+清理项目输出&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;新的锚点任务是必须的，以保证在不需要设备连接的情况下能运行常规检查。&lt;br /&gt;
+需要注意的是，&lt;code&gt;build&lt;/code&gt;任务并不依赖&lt;code&gt;deviceCheck&lt;/code&gt;或者&lt;code&gt;connectedCheck&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;一个Android项目至少有两个输出：debug APK 和 release APK。它们每一个都有自己的锚点任务来帮助它们完成独立的构建：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;assemble
+    &lt;ul&gt;
+      &lt;li&gt;assembleDebug&lt;/li&gt;
+      &lt;li&gt;assembleRelease&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;它们都依赖其它任务来完成构建一个apk所需要的多个步骤。&lt;code&gt;assemble&lt;/code&gt;任务依赖这两个任务，所以调用&lt;code&gt;assemble&lt;/code&gt;会生成两个APK。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Tip: Gradle支持在命令行中使用camel形式的任务名缩写。&lt;br /&gt;
+例如：&lt;br /&gt;
+&lt;code&gt;gradle aR&lt;/code&gt;和&lt;code&gt;gradle assembleRelease&lt;/code&gt;是一样的，因为没有别的任务名有同样的缩写&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;锚点任务&lt;code&gt;check&lt;/code&gt;也有自己的依赖：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;check
+    &lt;ul&gt;
+      &lt;li&gt;lint&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;connectedCheck
+    &lt;ul&gt;
+      &lt;li&gt;connectedAndroidTest&lt;/li&gt;
+      &lt;li&gt;connectedUiAutomatorTest (not implemented yet)&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;deviceCheck&lt;br /&gt;
+    &lt;ul&gt;
+      &lt;li&gt;依赖于当其它插件实现测试扩展点时所创建的任务。&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;最终，插件会为所有构建类型(debug, release, test)创建&lt;code&gt;install&lt;/code&gt;/&lt;code&gt;uninstall&lt;/code&gt;任务，如果输出文件可以安装的话(必须签名)。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-9&quot;&gt;3.4 基本的构建过程定制&lt;/h3&gt;
+
+&lt;p&gt;Android插件提供了大量DSL来直接从构建系统中定制大多数事情。&lt;/p&gt;
+
+&lt;h4 id=&quot;manifest&quot;&gt;3.4.1 Manifest属性&lt;/h4&gt;
+
+&lt;p&gt;通过DSL，可以配置以下manifest属性：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;minSdkVersion&lt;/li&gt;
+  &lt;li&gt;targetSdkVersion&lt;/li&gt;
+  &lt;li&gt;versionCode&lt;/li&gt;
+  &lt;li&gt;versionName&lt;/li&gt;
+  &lt;li&gt;applicationId (实际的packageName – 前往 &lt;a href=&quot;http://tools.android.com/tech-docs/new-build-system/applicationid-vs-packagename&quot;&gt;ApplicationId versus PackageName&lt;/a&gt; 查看更多)&lt;/li&gt;
+  &lt;li&gt;Package Name for the test application&lt;/li&gt;
+  &lt;li&gt;Instrumentation test runner&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;例如：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    compileSdkVersion 19
+    buildToolsVersion &quot;19.0.0&quot;
+
+    defaultConfig {
+        versionCode 12
+        versionName &quot;2.0&quot;
+        minSdkVersion 16
+        targetSdkVersion 16
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;配置项位于&lt;code&gt;android&lt;/code&gt;元素中的&lt;code&gt;defaultConfig&lt;/code&gt;元素中。&lt;/p&gt;
+
+&lt;p&gt;之前版本的Android Plugin使用packageName来配置manifest文件的&lt;code&gt;packageName &lt;/code&gt;属性。从0.11.1版本开始，你应该在build.gradle文件使用applicationId来配置manifest文件的&lt;code&gt;packageName &lt;/code&gt;属性。&lt;br /&gt;
+这是为了消除Android应用的&lt;code&gt;packageName&lt;/code&gt;(作为Android应用的ID)和java包名之间的疑义。&lt;/p&gt;
+
+&lt;p&gt;在构建文件中定义的强大之处在于它可以是动态的。&lt;br /&gt;
+例如，可以从一个文件中读取版本名称，或者使用自定义的逻辑：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;def computeVersionName() {
+    ...
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion &quot;19.0.0&quot;
+
+    defaultConfig {
+        versionCode 12
+        versionName computeVersionName()
+        minSdkVersion 16
+        targetSdkVersion 16
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; 函数名不要与指定范围内已经存在的getter方法名冲突。例如，在&lt;code&gt;defaultConfig { ...}&lt;/code&gt;中调用getVersionName()会自动使用defaultConfig.getVersionName()，而不是你自定义的其它getVersionName()。&lt;/p&gt;
+
+&lt;p&gt;如果属性没有通过DSL设置，那么默认的属性值会被使用。下面是默认的属性值列表：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Property Name&lt;/th&gt;
+      &lt;th&gt;Default value in DSL object&lt;/th&gt;
+      &lt;th&gt;Default value&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;versionCode&lt;/td&gt;
+      &lt;td&gt;-1&lt;/td&gt;
+      &lt;td&gt;value from manifest if present&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;versionName&lt;/td&gt;
+      &lt;td&gt;null&lt;/td&gt;
+      &lt;td&gt;value from manifest if present&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;minSdkVersion&lt;/td&gt;
+      &lt;td&gt;-1&lt;/td&gt;
+      &lt;td&gt;value from manifest if present&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;targetSdkVersion&lt;/td&gt;
+      &lt;td&gt;-1&lt;/td&gt;
+      &lt;td&gt;value from manifest if present&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;applicationId&lt;/td&gt;
+      &lt;td&gt;null&lt;/td&gt;
+      &lt;td&gt;value from manifest if present&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;testApplicationId&lt;/td&gt;
+      &lt;td&gt;null&lt;/td&gt;
+      &lt;td&gt;applicationId + “.test”&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;testInstrumentationRunner&lt;/td&gt;
+      &lt;td&gt;null&lt;/td&gt;
+      &lt;td&gt;android.test.InstrumentationTestRunner&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;signingConfig&lt;/td&gt;
+      &lt;td&gt;null&lt;/td&gt;
+      &lt;td&gt;null&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;proguardFile&lt;/td&gt;
+      &lt;td&gt;N/A (set only)&lt;/td&gt;
+      &lt;td&gt;N/A (set only)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;proguardFiles&lt;/td&gt;
+      &lt;td&gt;N/A (set only)&lt;/td&gt;
+      &lt;td&gt;N/A (set only)&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;如果你在构建脚本中使用自定义的逻辑读取这些属性，那么第二列的属性就很重要。例如，你可能这样写：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if (android.defaultConfig.testInstrumentationRunner == null) {
+    // assign a better default...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如果这个值是null，那么在构建过程中会被第三列的默认值替代，但是DSL元素不会包含这个默认值(第三列的值)，所以你查询不到这个值。这是为了防止解析应用的manifest文件，除非真的必要。&lt;/p&gt;
+
+&lt;h4 id=&quot;build-types-&quot;&gt;3.4.2 Build Types 构建类型&lt;/h4&gt;
+
+&lt;p&gt;默认情况下，Android插件会自动设置项目同时构建debug和release版本的应用程序。&lt;br /&gt;
+这两个版本的不同之处主要在于能否在一个安全设备上调试程序，和APK如何签名。&lt;/p&gt;
+
+&lt;p&gt;debug版本使用一个自动创建的密钥/证书，并使用已知的name/password来签名(防止构建过程中出现请求提示)。release版本在构建过程中没有签名，需要稍后签名。&lt;/p&gt;
+
+&lt;p&gt;这些配置通过一个构建类型(BuildTpye)对象来设置。默认情况下，debug和release这两个构建类型都会被创建。&lt;/p&gt;
+
+&lt;p&gt;Android插件允许自定义这两个实例，也允许创建其它构建类型。这些都在buildTypes的DSL容器中配置：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    buildTypes {
+        debug {
+            applicationIdSuffix &quot;.debug&quot;
+        }
+
+        jnidebug.initWith(buildTypes.debug)
+        jnidebug {
+            packageNameSuffix &quot;.jnidebug&quot;
+            jniDebuggable true
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面的代码片段完成来以下功能：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;配置默认的&lt;code&gt;debug&lt;/code&gt;构建类型：
+    &lt;ul&gt;
+      &lt;li&gt;将包名设置成&lt;code&gt;&amp;lt;app appliationId&amp;gt;.debug&lt;/code&gt;，以便在同一设备上同时安装debug和release版本&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;创建了一个新的名为&lt;code&gt;jnidebug&lt;/code&gt;的构建类型，是debug构建类型的一个副本&lt;/li&gt;
+  &lt;li&gt;配置&lt;code&gt;jnidebug&lt;/code&gt;构建类型，允许调试JNI组件，并且添加一个不同的包名后缀&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;创建一个新的构建类型就像在&lt;code&gt;buildTypes&lt;/code&gt;容器中使用一个新的元素一样简单，可以通过调用&lt;code&gt;initWith()&lt;/code&gt;或者使用闭包来配置&lt;/p&gt;
+
+&lt;p&gt;以下是可能用到的属性和它们的默认值：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Property name&lt;/th&gt;
+      &lt;th&gt;Default values for debug&lt;/th&gt;
+      &lt;th&gt;Default values for release / other&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;debuggable&lt;/td&gt;
+      &lt;td&gt;true&lt;/td&gt;
+      &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;jniDebuggable&lt;/td&gt;
+      &lt;td&gt;false&lt;/td&gt;
+      &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;renderscriptDebuggable&lt;/td&gt;
+      &lt;td&gt;false&lt;/td&gt;
+      &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;renderscriptOptimLevel&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;applicationIdSuffix&lt;/td&gt;
+      &lt;td&gt;null&lt;/td&gt;
+      &lt;td&gt;null&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;versionNameSuffix&lt;/td&gt;
+      &lt;td&gt;null&lt;/td&gt;
+      &lt;td&gt;null&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;signingConfig&lt;/td&gt;
+      &lt;td&gt;android.signingConfigs.debug&lt;/td&gt;
+      &lt;td&gt;null&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;zipAlignEnabled&lt;/td&gt;
+      &lt;td&gt;false&lt;/td&gt;
+      &lt;td&gt;true&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;minifyEnabled&lt;/td&gt;
+      &lt;td&gt;false&lt;/td&gt;
+      &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;proguardFile&lt;/td&gt;
+      &lt;td&gt;N/A (set only)&lt;/td&gt;
+      &lt;td&gt;N/A (set only)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;proguardFiles&lt;/td&gt;
+      &lt;td&gt;N/A (set only)&lt;/td&gt;
+      &lt;td&gt;N/A (set only)&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;除了以上这些属性，&lt;em&gt;Build Types&lt;/em&gt;还可以通过源码和资源来影响构建过程。&lt;br /&gt;
+每一个构建类型都会创建一个匹配的&lt;em&gt;sourceSet&lt;/em&gt;，默认的路径为：&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;
+src/&amp;lt;buildtypename&amp;gt;/
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;这意味这新的构建类型的名字不能是&lt;em&gt;main&lt;/em&gt;或者&lt;em&gt;androidTest&lt;/em&gt;(这是插件强制要求的)，而构建类型的名称必须是唯一的。&lt;/p&gt;
+
+&lt;p&gt;像其它&lt;em&gt;sourceSet&lt;/em&gt;一样，构建类型的&lt;em&gt;sourceSet&lt;/em&gt;可以重新被定向：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    sourceSets.jnidebug.setRoot(&#39;foo/jnidebug&#39;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;另外，每一个&lt;em&gt;Build Type&lt;/em&gt;都会创建一个&lt;code&gt;assemble&amp;lt;BuildTypeName&amp;gt;&lt;/code&gt;任务。&lt;/p&gt;
+
+&lt;p&gt;在前面，&lt;code&gt;assembleDebug&lt;/code&gt;和&lt;code&gt;assembleRelease&lt;/code&gt;已经提到过了，这就是它们的来源。当debug和release构建类型被预创建的时候，它们相关的任务就被自动创建了，比如&lt;code&gt;assembleDebug&lt;/code&gt;和&lt;code&gt;assembleRelease&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;上面的&lt;em&gt;build.gradle&lt;/em&gt;片段同样会创建&lt;code&gt;assembleJnidebug&lt;/code&gt;任务，&lt;code&gt;assemble&lt;/code&gt;会像依赖&lt;code&gt;assembleDebug&lt;/code&gt;和&lt;code&gt;assembleRelease&lt;/code&gt;任务一样依赖&lt;code&gt;assembleJnidebug&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;Tip: 你可以在命令行下输入&lt;code&gt;gradle aJ&lt;/code&gt;来运行&lt;code&gt;assembleJnidebug&lt;/code&gt;任务。&lt;/p&gt;
+
+&lt;p&gt;可能用到的场景：  &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;只有debug模式才需要的权限，而release模式不需要&lt;/li&gt;
+  &lt;li&gt;自定义debug实现&lt;/li&gt;
+  &lt;li&gt;debug模式使用不同的资源(例如，资源取值与签名证书绑定)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;BuildType&lt;/em&gt;的源码和资源通过以下方式使用：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;manifest文件合并到app的manifest文件中  &lt;/li&gt;
+  &lt;li&gt;源码作为另一个源码目录&lt;/li&gt;
+  &lt;li&gt;资源叠加到main的资源中，取代已经存在的值&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;signing-configurations-&quot;&gt;3.4.3 Signing Configurations 签名配置&lt;/h4&gt;
+
+&lt;p&gt;对一个应用程序签名需要以下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;一个keystore&lt;/li&gt;
+  &lt;li&gt;一个keystore密码&lt;/li&gt;
+  &lt;li&gt;一个key的别名&lt;/li&gt;
+  &lt;li&gt;一个key密码&lt;/li&gt;
+  &lt;li&gt;存储类型&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;位置，别名，两个密码和存储类型一个组成一个签名配置(&lt;em&gt;SigningConfig&lt;/em&gt;)&lt;/p&gt;
+
+&lt;p&gt;默认情况下，&lt;code&gt;debug&lt;/code&gt;签名配置使用一个debug keystore，已知的密码和已知的别名以及别名密码。&lt;br /&gt;
+debug keystore位于&lt;code&gt;$HOME/.android/debug.keystore&lt;/code&gt;，如果没有的话会自动创建一个。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;debug&lt;/code&gt;构建类型会自动使用&lt;code&gt;debug&lt;/code&gt; &lt;em&gt;SigningConfig&lt;/em&gt;。    &lt;/p&gt;
+
+&lt;p&gt;可以创建其它签名配置或者自定义默认内建配置。通过&lt;code&gt;signingConfigs&lt;/code&gt; DSL容器来配置&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    signingConfigs {
+        debug {
+            storeFile file(&quot;debug.keystore&quot;)
+        }
+
+        myConfig {
+            storeFile file(&quot;other.keystore&quot;)
+            storePassword &quot;android&quot;
+            keyAlias &quot;androiddebugkey&quot;
+            keyPassword &quot;android&quot;
+        }
+    }
+
+    buildTypes {
+        foo {
+            debuggable true
+            jniDebuggable true
+            signingConfig signingConfigs.myConfig
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;上面的片段修改debug keystore的位置到项目根目录下。这会影响任何使用它的构建类型，在这个案例中，受影响的是&lt;code&gt;debug&lt;/code&gt;构建类型。&lt;/p&gt;
+
+&lt;p&gt;这里也创建了一个新的签名配置和一个使用这个新签名配置的行的构建类型。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; 只有默认路径下debug keystore不存在的时候会被自动创建。改变debug keystore的路径则不会在新的路径下自动创建debug keystore。创建一个名字不同的签名配置，但是使用默认的debug keystore路径，会自动创建debug keystore。也就是说，是否自动创建debug keystore，是由keystore的位置决定，而不是配置的名称。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; keystore的路径通常是项目根目录的相对路径，但是也可以使用绝对路径，尽管不推荐这样(debug keystore除外，因为它会自动被创建)。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note: 如果你要把这些文件添加到版本控制系统中，你可能不想把密码写在文件中。下面的Stack Overflow连接提供了从从控制台或者环境变量读取的方法。&lt;br /&gt;
+&lt;a href=&quot;http://stackoverflow.com/questions/18328730/how-to-create-a-release-signed-apk-file-using-gradle&quot;&gt;http://stackoverflow.com/questions/18328730/how-to-create-a-release-signed-apk-file-using-gradle&lt;/a&gt;&lt;br /&gt;
+我们以后会更新指南，提供更多的细节&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;running-proguard-proguard&quot;&gt;3.4.4 Running ProGuard 运行ProGuard&lt;/h4&gt;
+
+&lt;p&gt;ProGuard从Gradle plugin for ProGuard 4.10开始支持的(since Gradle plugin 0.4)。如果构建类型的&lt;code&gt;minifyEnabled&lt;/code&gt;属性被设置为true，那么Progruard插件会自动被添加进来，对应的任务也自动被创建。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; 从Gradle插件版本0.14.0开始BuildType.runProguard更改为minifyEnabled属性。具体请参考&lt;a href=&quot;http://tools.android.com/tech-docs/new-build-system&quot;&gt;Release notes&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFile getDefaultProguardFile(&#39;proguard-android.txt&#39;)
+        }
+    }
+
+    productFlavors {
+        flavor1 {
+        }
+        flavor2 {
+            proguardFile &#39;some-other-rules.txt&#39;
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Variant会使用所有声明的规则文件，包括声明在相应的Build Type和flavor中的。&lt;/p&gt;
+
+&lt;p&gt;SDK中有两个默认的规则文件：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;proguard-android.txt&lt;/li&gt;
+  &lt;li&gt;proguard-android-optimize.txt&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;它们位于sdk路径下，使用&lt;em&gt;getDefaultProguardFile()&lt;/em&gt;可以获取文件的完整路径。它们除了是否要进行优化之外，其它都是相同的。&lt;/p&gt;
+
+&lt;h4 id=&quot;shrinking-resources-&quot;&gt;3.4.5 Shrinking Resources 压缩资源文件&lt;/h4&gt;
+
+&lt;p&gt;You can also remove unused resources, automatically, at build time. For more information, see the Resource Shrinking document.&lt;/p&gt;
+
+&lt;p&gt;构建时可以自动移除没有被使用的资源文件。更多详细信息请查看文档&lt;a href=&quot;http://tools.android.com/tech-docs/new-build-system/resource-shrinking&quot;&gt;资源文件压缩&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;android-1&quot;&gt;4 依赖关系，Android库项目和多项目设置&lt;/h2&gt;
+
+&lt;p&gt;Gradle项目可以依赖其它组件，这些组件可以是外部二进制包，或者其它Gradle项目。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-10&quot;&gt;4.1 依赖二进制包&lt;/h3&gt;
+
+&lt;h4 id=&quot;section-11&quot;&gt;4.1.1 本地包&lt;/h4&gt;
+
+&lt;p&gt;为了配置一个外部库jar依赖，你需要在&lt;code&gt;compile&lt;/code&gt;配置中添加一个依赖&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;dependencies {
+    compile files(&#39;libs/foo.jar&#39;)
+}
+
+android {
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; &lt;code&gt;dependencies&lt;/code&gt;DSL元素是标准Gradle API的一部分，并不属于&lt;code&gt;android&lt;/code&gt;元素。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;compile&lt;/code&gt;配置是用来编译main应用的。任何添加到编译路径中的东西都会被打包到最终的apk文件中。&lt;br /&gt;
+下面是其它一些在添加依赖时可能用到的配置：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code&gt;compile&lt;/code&gt;: 主module&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;androidTestCompile&lt;/code&gt;: 测试module&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;debugCompile&lt;/code&gt;: debug构建类型的编译&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;releaseCompile&lt;/code&gt;: release构建类型的编译&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;因为构建一个apk必然有一个相关的构建类型，所以apk通常至少有两个编译配置：&lt;code&gt;compile&lt;/code&gt;和&lt;em&gt;&lt;code&gt;&amp;lt;buildtype&amp;gt;Compile&lt;/code&gt;&lt;/em&gt;&lt;br /&gt;
+创建一个构建类型时会自动创建一个基于它名字的编译配置&lt;em&gt;&lt;code&gt;&amp;lt;buildtype&amp;gt;Compile&lt;/code&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;当你在debug版本里需要使用一个自定义库（例如记录crash信息），而release版本不需要，或者他们依赖同一个库的不同版本的时候，会非常有用。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;也可以通过添加一个目录来依赖目录下的所有jar文件：
+    &lt;code&gt;compile fileTree(dir: &#39;libs&#39;, include: [&#39;*.jar&#39;])&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;section-12&quot;&gt;4.1.2 远程文件&lt;/h4&gt;
+
+&lt;p&gt;Gradle支持从Maven或者Ivy仓库获取依赖文件。&lt;/p&gt;
+
+&lt;p&gt;首先，必须把仓库添加到列表中，其次，必须按照Maven或者Ivy的文件声明规范来声明依赖。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    compile &#39;com.google.guava:guava:11.0.2&#39;
+}
+
+android {
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; &lt;code&gt;mavenCentral()&lt;/code&gt;是指定仓库URL的便捷方式。Gradle支持远程和本地仓库。&lt;br /&gt;
+&lt;strong&gt;Note:&lt;/strong&gt; Gradle遵循依赖关系的传递性。如果一个被依赖文件也依赖其它文件，那些被依赖的文件也会被拉取下来。&lt;/p&gt;
+
+&lt;p&gt;更多关于配置依赖的信息，请查看&lt;a href=&quot;http://gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html&quot;&gt;Gradle用户指南&lt;/a&gt;和&lt;a href=&quot;http://gradle.org/docs/current/dsl/org.gradle.api.artifacts.dsl.DependencyHandler.html&quot;&gt;DSL文档&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;section-13&quot;&gt;4.2 多项目设置&lt;/h3&gt;
+
+&lt;p&gt;Gradle项目可以通过多项目设置依赖其它gradle项目。&lt;/p&gt;
+
+&lt;p&gt;一个多项目设置通常把所有子项目作为子目录放在指定的项目根目录下。&lt;/p&gt;
+
+&lt;p&gt;例如，项目结构如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;MyProject/
+ + app/
+ + libraries/
+    + lib1/
+    + lib2/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;我们在这个结构中定义3个项目。Gradle将通过以下名字引用它们：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;:app
+:libraries:lib1
+:libraries:lib2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;每个项目都有自己的&lt;code&gt;build.gradle&lt;/code&gt;文件，声明来它怎样构建。另外，在根目录下还有一个&lt;code&gt;settings.gradle&lt;/code&gt;文件，声明了所有的子项目。&lt;br /&gt;
+目录结构如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;MyProject/
+ | settings.gradle
+ + app/
+    | build.gradle
+ + libraries/
+    + lib1/
+       | build.gradle
+    + lib2/
+       | build.gradle
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;settings.gradle&lt;/code&gt;文件的内容十分简单：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;include &#39;:app&#39;, &#39;:libraries:lib1&#39;, &#39;:libraries:lib2&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;指明哪个文件夹是一个实际的Gradle项目。  &lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;:app&lt;/code&gt;项目或许依赖其它库项目，那么依赖关系声明如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;dependencies {
+    compile project(&#39;:libraries:lib1&#39;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;更多关于多项目设置的信息在&lt;a href=&quot;http://gradle.org/docs/current/userguide/multi_project_builds.html&quot;&gt;这里&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-14&quot;&gt;4.3 库项目&lt;/h3&gt;
+
+&lt;p&gt;在上面的多项目设置中，&lt;code&gt;:libraries:lib1&lt;/code&gt;和&lt;code&gt;:libraries:lib2&lt;/code&gt;可能是Java项目，&lt;code&gt;:app&lt;/code&gt;Android项目将会使用它们输出的jar文件。&lt;/p&gt;
+
+&lt;p&gt;然而，如果你想要共享使用了Android API或者Android资源文件的代码(在库项目中使用了Android API或Android资源文件)，这些库项目就不能是常规的Java项目，必须是Android库项目。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-15&quot;&gt;4.3.1 创建一个库项目&lt;/h4&gt;
+
+&lt;p&gt;一个库项目和常规的Android项目很相似，只有很少的区别。&lt;/p&gt;
+
+&lt;p&gt;因为构建库项目和构建应用程序不一样，所以使用不同的插件。构建库项目的插件和构建应用程序的插件在内部共享大部分的代码，并且它们都是由&lt;code&gt;com.android.tools.build.gradle&lt;/code&gt;jar库提供。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath &#39;com.android.tools.build:gradle:0.5.6&#39;
+    }
+}
+
+apply plugin: &#39;android-library&#39;
+
+android {
+    compileSdkVersion 15
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这是一个使用API 15编译的库项目。&lt;code&gt;SourceSets&lt;/code&gt;和依赖关系的处理跟应用程序项目中一样，而且定制方式也一样。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-16&quot;&gt;4.3.2 普通项目和库项目的区别&lt;/h4&gt;
+
+&lt;p&gt;一个库项目的主要输出是一个&lt;code&gt;.aar&lt;/code&gt;包（它代表Android的归档文件）。它包含编译好的源码（例如jar文件或者本地.so文件）以及资源文件（manifest, res, assets）。&lt;br /&gt;
+一个库项目也可以生成一个测试apk来测试，而不依赖应用程序。&lt;/p&gt;
+
+&lt;p&gt;由于使用同样的锚点任务（&lt;code&gt;assembleDebug&lt;/code&gt;, &lt;code&gt;assembleRelease&lt;/code&gt;），所以在命令行中构建库项目和普通项目没有区别。&lt;/p&gt;
+
+&lt;p&gt;其余部分，库项目和应用程序项目一样。都有构建类型和product flavors，可以生成多个版本的aar。&lt;br /&gt;
+要注意的是，多数Build Type配置不适用于库项目。然而，你可以定制&lt;code&gt;sourceSet&lt;/code&gt;来改变所依赖库的内容，不论它是被普通项目使用还是被测试。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-17&quot;&gt;4.3.3 引用一个库项目&lt;/h4&gt;
+
+&lt;p&gt;引用一个库项目和引用其它项目的方式一样：  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;dependencies {
+    compile project(&#39;:libraries:lib1&#39;)
+    compile project(&#39;:libraries:lib2&#39;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; 如果你由多个库项目，那么顺序是很重要的。这和旧构建系统中的&lt;code&gt;project.properties&lt;/code&gt;文件中的依赖顺序一样重要。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-18&quot;&gt;4.3.4 库项目发布&lt;/h4&gt;
+
+&lt;p&gt;默认的情况下，库项目只会发布release变种版本(release variant)。这个版本会被所有引用了库项目的项目使用，不管它们自己构建的是什么版本。这是Gradle导致的限制，我们正努力消除这个限制。&lt;/p&gt;
+
+&lt;p&gt;可以如下控制哪个版本会被发布： &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    defaultPublishConfig &quot;debug&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;要注意的是，这个发布配置名称必须是完整的variant名称，&lt;code&gt;release&lt;/code&gt;和&lt;code&gt;debug&lt;/code&gt;这两个名称只有在没有flavor的时候才使用。如果想要在有flavor的时候改变默认的发布版本，你必须这样写：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    defaultPublishConfig &quot;flavor1Debug&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;发布库项目的所有版本也是可能的。我们计划在普通的项目依赖项目的工程中允许这种做法，但是由于Gradle的限制，现在还不能这么做（我们也在努力修复这个问题）。&lt;/p&gt;
+
+&lt;p&gt;发布所有版本的功能默认没有开启。开启如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    publishNonDefault true
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;必须认识到发布多个variant版本意味着发布多个aar文件，而不是在一个aar文件中包含了多个variant版本。每一个aar文件就是一个独立的variant。&lt;/p&gt;
+
+&lt;p&gt;发布一个variant版本意味着构建出了一个可用的aar文件，作为Gradle项目的输出文件。这个文件可以发布到maven仓库，或者在其他项目依赖该库项目时作为依赖目标。&lt;/p&gt;
+
+&lt;p&gt;Gradle有默认文件的概念。下面这个就使用了默认文件：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;compile project(&#39;:libraries:lib2&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;为了依赖其他的发布版本，你必须指定具体使用哪一个：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;dependencies {
+    flavor1Compile project(path: &#39;:lib1&#39;, configuration: &#39;flavor1Release&#39;)
+    flavor2Compile project(path: &#39;:lib1&#39;, configuration: &#39;flavor2Release&#39;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;重要:&lt;/strong&gt; 要注意已发布的配置是完整的variant版本，包含了构建类型，因此引用的时候也必须是完整的。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;重要:&lt;/strong&gt; 当开启了无默认版本发布，Maven发布插件会把这些额外的版本作为扩展包（按分类器）发布。这意味着并不是真正兼容地发布到maven仓库。你应该发布一个独立的vatiant到仓库，或者开启发布所有配置来支持跨项目依赖。&lt;/p&gt;
+
+&lt;h2 id=&quot;testing-&quot;&gt;5 Testing 测试&lt;/h2&gt;
+
+&lt;p&gt;构建一个测试应用已经内置在应用项目内。不需要再创建单独的测试项目。&lt;/p&gt;
+
+&lt;h3 id=&quot;unit-testing-&quot;&gt;5.1 Unit Testing 单元测试&lt;/h3&gt;
+
+&lt;p&gt;试验性的单元测试功能支持已经加入到1.1中，具体请看&lt;a href=&quot;http://tools.android.com/tech-docs/unit-testing-support&quot;&gt;这个页面&lt;/a&gt;。本节其他部分讲述的是”instrumentation tests”&lt;/p&gt;
+
+&lt;h3 id=&quot;basics-and-configuration&quot;&gt;5.2 Basics and Configuration&lt;/h3&gt;
+
+&lt;p&gt;正如前面提到的，紧邻着&lt;code&gt;main&lt;/code&gt; &lt;em&gt;sourceSet&lt;/em&gt; 的就是 &lt;code&gt;androidTest&lt;/code&gt; &lt;em&gt;sourceSet&lt;/em&gt;，默认在&lt;code&gt;src/androidTest/&lt;/code&gt;路径下。&lt;/p&gt;
+
+&lt;p&gt;从这个&lt;em&gt;sourceSet&lt;/em&gt; 会构建出一个使用Android测试框架，并且可以部署到设备上的测试apk来测试应用程序。这里面可以包含单元测试，集成测试，和后续UI自动化测试。&lt;/p&gt;
+
+&lt;p&gt;测试应用的&lt;code&gt;&amp;lt;instrumentation&amp;gt;&lt;/code&gt;节点是自动生成的，但是你也可以创建一个&lt;code&gt;src/androidTest/AndroidManifest.xml&lt;/code&gt; ，并在这个manifest文件中添加其他组件。&lt;/p&gt;
+
+&lt;p&gt;下面是一些测试应用可以配置的值：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;testPackageName&lt;/li&gt;
+  &lt;li&gt;testInstrumentationRunner&lt;/li&gt;
+  &lt;li&gt;testHandleProfiling&lt;/li&gt;
+  &lt;li&gt;testFunctionalTest&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;正如前面所看到的，这些在defaultConfig对象中配置：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    defaultConfig {
+        testPackageName &quot;com.test.foo&quot;
+        testInstrumentationRunner &quot;android.test.InstrumentationTestRunner&quot;
+        testHandleProfiling true
+        testFunctionalTest true
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在测试应用程序的manifest文件中，instrumentation节点的targetPackage属性值会自动使用测试应用的package名称设置，即使这个名称是通过defaultConfig或者Build Type对象自定义的。这也是manifest文件需要自动生成的一个原因。&lt;/p&gt;
+
+&lt;p&gt;另外，这个测试sourceSet也可以拥有自己的依赖。
+默认情况下，应用程序和他的依赖会自动添加的测试应用的classpath中，但是也可以通过以下来扩展：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;dependencies {
+    androidTestCompile &#39;com.google.guava:guava:11.0.2&#39;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;测试应用通过&lt;code&gt;assembleTest&lt;/code&gt;任务来构建。assembleTest不依赖于main中的&lt;code&gt;assemble&lt;/code&gt; 任务，需要手动设置运行，不能自动运行。&lt;/p&gt;
+
+&lt;p&gt;目前只有一个Build Type被测试。默认情况下是&lt;code&gt;debug&lt;/code&gt; &lt;em&gt;Build Type&lt;/em&gt;，但是这也可以通过以下自定义配置：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    ...
+    testBuildType &quot;staging&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;running-tests-&quot;&gt;5.3 Running tests 运行测试&lt;/h3&gt;
+
+&lt;p&gt;正如前面提到的，检查通过锚点任务&lt;code&gt;connectedCheck&lt;/code&gt;启动，这需要一个设备已连接。&lt;br /&gt;
+这个过程依赖于androidTest任务，因此将会运行androidTest。这个task将会执行下面内容：  &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;确认应用和测试应用都被构建（依赖于&lt;code&gt;assembleDebug&lt;/code&gt;和&lt;code&gt;assembleTest&lt;/code&gt;）&lt;/li&gt;
+  &lt;li&gt;安装这两个应用&lt;/li&gt;
+  &lt;li&gt;运行这些测试&lt;/li&gt;
+  &lt;li&gt;卸载这两个应用.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;如果有多于一个连接设备，那么所有测试都会同时运行在所有连接设备上。如果其中一个测试失败，不管是哪一个设备，这个构建就失败。&lt;/p&gt;
+
+&lt;p&gt;所有测试结果都被保存为XML文档，路径为：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;build/androidTest-results
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;（这和常规的JUnit类似，运行结果保存在build/test-results）&lt;br /&gt;
+同样，这也可以自定义配置：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    ...
+
+    testOptions {
+        resultsDir = &quot;$project.buildDir/foo/results&quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;android.testOptions.resultsDir&lt;/code&gt;由Project.file(String)获得。&lt;/p&gt;
+
+&lt;h3 id=&quot;testing-android-libraries-android&quot;&gt;5.4 Testing Android Libraries 测试Android库&lt;/h3&gt;
+
+&lt;p&gt;测试Android库项目的方法与应用项目的测试方法基本一样。&lt;/p&gt;
+
+&lt;p&gt;唯一的不同在于整个库（包括它的依赖）都是自动作为依赖库被添加到测试应用中。结果就是测试APK不单只包含它的代码，还包含了库项目自己和库的所有依赖。  &lt;/p&gt;
+
+&lt;p&gt;库的manifest被组合到测试应用的manifest中（和其他项目引用这个库时一样）。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;androidTest&lt;/code&gt;变成只是安装（或者卸载）测试APK（因为没有其它APK要安装）。&lt;/p&gt;
+
+&lt;p&gt;其它的部分都是类似的。&lt;/p&gt;
+
+&lt;h3 id=&quot;test-reports-&quot;&gt;5.5 Test reports 测试报告&lt;/h3&gt;
+
+&lt;p&gt;When running unit tests, Gradle outputs an HTML report to easily look at the results.
+The Android plugins build on this and extends the HTML report to aggregate the results from all connected devices.&lt;/p&gt;
+
+&lt;p&gt;当运行单元测试的时候，Gradle会输出一份HTML格式的报告以方便查看结果。  &lt;br /&gt;
+Android plugin也是基于此，并且扩展了HTML报告文件，它将所有连接设备的报告都合并到一个文件里面。&lt;/p&gt;
+
+&lt;h4 id=&quot;single-projects-&quot;&gt;5.5.1 Single projects 独立项目&lt;/h4&gt;
+
+&lt;p&gt;项目将会自动生成测试运行，测试报告默认位置：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;build/reports/androidTests
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这非常类似于JUnit的报告所在位置&lt;code&gt;build/reports/tests&lt;/code&gt;，其它的报告通常位于&lt;code&gt;build/reports/&amp;lt;plugin&amp;gt;/&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;这个路径也可以通过以下方式自定义：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    ...
+
+    testOptions {
+        reportDir = &quot;$project.buildDir/foo/report&quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;报告将会合并运行在不同设备上的测试结果。&lt;/p&gt;
+
+&lt;h4 id=&quot;multi-projects-reports&quot;&gt;5.5.2 Multi-projects reports&lt;/h4&gt;
+
+&lt;p&gt;In a multi project setup with application(s) and library(ies) projects, when running all tests at the same time, it might be useful to generate a single reports for all tests.&lt;/p&gt;
+
+&lt;p&gt;在一个配置了多个应用或者多个库项目的项目中，当同时运行所有测试的时候，生成一个单一报告文件记录所有的测试可能是非常有用的。&lt;/p&gt;
+
+&lt;p&gt;To do this, a different plugin is available in the same artifact. It can be applied with:&lt;/p&gt;
+
+&lt;p&gt;为了实现这个目的，需要使用同一个依赖文件中的另一个插件。可以通过以下方式添加：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath &#39;com.android.tools.build:gradle:0.5.6&#39;
+    }
+}
+
+apply plugin: &#39;android-reporting&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这必须添加到项目的根目录下，例如与settings.gradle文件同个目录的build.gradle文件中。&lt;/p&gt;
+
+&lt;p&gt;然后，在命令行中导航到项目根目录下，输入以下命令就可以运行所有测试并合并所有报告：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;gradle deviceCheck mergeAndroidReports --continue
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;注意：&lt;code&gt;--continue&lt;/code&gt; 选项将允许所有测试，即使子项目中的任何一个运行失败都不会停止。如果没有这个选项，第一个失败测试将会终止全部测试的运行，这可能导致一些项目没有执行过它们的测试。&lt;/p&gt;
+
+&lt;h3 id=&quot;lint-support&quot;&gt;5.6 Lint support&lt;/h3&gt;
+
+&lt;p&gt;As of version 0.7.0, you can run lint for a specific variant, or for all variants, in which case it produces a report which describes which specific variants a given issue applies to.&lt;/p&gt;
+
+&lt;p&gt;从0.7.0版本开始，你可以为项目中一个特定的variant版本运行lint，也可以为所有variant版本都运行lint。它将会生成一个报告描述哪一个variant版本中存在着问题。&lt;/p&gt;
+
+&lt;p&gt;你可以通过以下lint选项配置lint。通常情况下你只需要配置其中一部分，以下列出了所有可使用的选项：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    lintOptions {
+        // set to true to turn off analysis progress reporting by lint
+        quiet true
+        // if true, stop the gradle build if errors are found
+        abortOnError false
+        // if true, only report errors
+        ignoreWarnings true
+        // if true, emit full/absolute paths to files with errors (true by default)
+        //absolutePaths true
+        // if true, check all issues, including those that are off by default
+        checkAllWarnings true
+        // if true, treat all warnings as errors
+        warningsAsErrors true
+        // turn off checking the given issue id&#39;s
+        disable &#39;TypographyFractions&#39;,&#39;TypographyQuotes&#39;
+        // turn on the given issue id&#39;s
+        enable &#39;RtlHardcoded&#39;,&#39;RtlCompat&#39;, &#39;RtlEnabled&#39;
+        // check *only* the given issue id&#39;s
+        check &#39;NewApi&#39;, &#39;InlinedApi&#39;
+        // if true, don&#39;t include source code lines in the error output
+        noLines true
+        // if true, show all locations for an error, do not truncate lists, etc.
+        showAll true
+        // Fallback lint configuration (default severities, etc.)
+        lintConfig file(&quot;default-lint.xml&quot;)
+        // if true, generate a text report of issues (false by default)
+        textReport true
+        // location to write the output; can be a file or &#39;stdout&#39;
+        textOutput &#39;stdout&#39;
+        // if true, generate an XML report for use by for example Jenkins
+        xmlReport false
+        // file to write report to (if not specified, defaults to lint-results.xml)
+        xmlOutput file(&quot;lint-report.xml&quot;)
+        // if true, generate an HTML report (with issue explanations, sourcecode, etc)
+        htmlReport true
+        // optional path to report (default will be lint-results.html in the builddir)
+        htmlOutput file(&quot;lint-report.html&quot;)
+
+   // set to true to have all release builds run lint on issues with severity=fatal
+   // and abort the build (controlled by abortOnError above) if fatal issues are found
+   checkReleaseBuilds true
+        // Set the severity of the given issues to fatal (which means they will be
+        // checked during release builds (even if the lint target is not included)
+        fatal &#39;NewApi&#39;, &#39;InlineApi&#39;
+        // Set the severity of the given issues to error
+        error &#39;Wakelock&#39;, &#39;TextViewEdits&#39;
+        // Set the severity of the given issues to warning
+        warning &#39;ResourceAsColor&#39;
+        // Set the severity of the given issues to ignore (same as disabling the check)
+        ignore &#39;TypographyQuotes&#39;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;build-variants-&quot;&gt;6 Build Variants 构建不同版本&lt;/h2&gt;
+
+&lt;p&gt;新构建系统的一个目标就是为一个应用构建不同的版本。&lt;/p&gt;
+
+&lt;p&gt;有两个主要的场景： &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;同一个应用的不同版本。例如，免费版和收费版  &lt;/li&gt;
+  &lt;li&gt;同一个应用，为了在Google Play Store上发布并适配多钟设备，打包出不同的apk。&lt;/li&gt;
+  &lt;li&gt;以上两种情况的综合&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;也就是说，从同一个项目中生成这些不同的apk，而不是使用一个库工程和2个以上的主应用工程。&lt;/p&gt;
+
+&lt;h3 id=&quot;product-flavors-&quot;&gt;6.1 Product flavors 产品定制&lt;/h3&gt;
+
+&lt;p&gt;一个&lt;code&gt;product flavor&lt;/code&gt;定义了项目构建输出的一个自定义应用版本。一个单独项目可以有不同的flavor，来生成不同的应用。&lt;/p&gt;
+
+&lt;p&gt;这个新概念(flavor)是用来解决不同应用版本间差异很小的情形。如果“这是否同一个应用？”的回答是肯定的话，这是比使用库项目更好的做法。&lt;/p&gt;
+
+&lt;p&gt;flavor使用&lt;code&gt;productFlavors&lt;/code&gt; 这个DSL容器来声明：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    ....
+
+    productFlavors {
+        flavor1 {
+            ...
+        }
+
+        flavor2 {
+            ...
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里创建了两个flavor，分别是 &lt;code&gt;flavor1&lt;/code&gt; 和 &lt;code&gt;flavor2&lt;/code&gt;。&lt;br /&gt;
+&lt;strong&gt;注意：&lt;/strong&gt; flavor的名字不能喝已有的&lt;em&gt;构建类型(Build Type)&lt;/em&gt;名字冲突，或者和&lt;code&gt;androidTest&lt;/code&gt;这个&lt;em&gt;sourceSet&lt;/em&gt;的名字冲突。&lt;/p&gt;
+
+&lt;h3 id=&quot;build-type--product-flavor--build-variant-&quot;&gt;6.2 Build Type + Product Flavor = Build Variant 构建类型＋产品定制＝变种版本&lt;/h3&gt;
+
+&lt;p&gt;前面已经提到，每一个构建类型都会生成一个apk。&lt;em&gt;忘了的话，请看3.4.2&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Product Flavors&lt;/em&gt; 也会做同样的事情，实际上，项目输出来自所有可能的，&lt;em&gt;Build Types&lt;/em&gt;和&lt;em&gt;Product Flavors&lt;/em&gt;的组合，如果有&lt;em&gt;Product Flavors&lt;/em&gt;的话。&lt;/p&gt;
+
+&lt;p&gt;每种&lt;em&gt;Build Types&lt;/em&gt;和&lt;em&gt;Product Flavors&lt;/em&gt;的组合就是一个&lt;em&gt;Build Variant&lt;/em&gt;。&lt;/p&gt;
+
+&lt;p&gt;例如，默认的&lt;code&gt;debug&lt;/code&gt; 和 &lt;code&gt;release&lt;/code&gt;这两个&lt;em&gt;Build Types&lt;/em&gt;，和上面创建的两个flavor会生成4个&lt;em&gt;Build Variants&lt;/em&gt;：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Flavor1 - debug&lt;/li&gt;
+  &lt;li&gt;Flavor1 - release&lt;/li&gt;
+  &lt;li&gt;Flavor2 - debug&lt;/li&gt;
+  &lt;li&gt;Flavor2 - release&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;没有flavor的项目也有&lt;em&gt;Build Variants&lt;/em&gt;，使用默认的没有名字的flavor配置，使得&lt;em&gt;Build Variants&lt;/em&gt;列表看起来和 &lt;em&gt;Build Types&lt;/em&gt;一样。&lt;/p&gt;
+
+&lt;h3 id=&quot;product-flavor-configuration-flavor&quot;&gt;6.3 Product Flavor Configuration 产品Flavor配置&lt;/h3&gt;
+
+&lt;p&gt;每个flavor在下面这样的闭包结构中配置：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    ...
+
+    defaultConfig {
+        minSdkVersion 8
+        versionCode 10
+    }
+
+    productFlavors {
+        flavor1 {
+            packageName &quot;com.example.flavor1&quot;
+            versionCode 20
+        }
+
+        flavor2 {
+            packageName &quot;com.example.flavor2&quot;
+            minSdkVersion 14
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;注意到&lt;code&gt;android.productFlavors.*&lt;/code&gt;和&lt;code&gt;android.defaultConfig&lt;/code&gt;的配置项类型相同，这意味着他们共享相同的属性。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;defaultConfig&lt;/code&gt;为所有的flavor提供默认的配置，每个flavor都可以覆盖配置项的值。上面的例子中，最终的配置如下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;flavor1
+    &lt;ul&gt;
+      &lt;li&gt;packageName: com.example.flavor1&lt;/li&gt;
+      &lt;li&gt;minSdkVersion: 8&lt;/li&gt;
+      &lt;li&gt;versionCode: 20&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;flavor2
+    &lt;ul&gt;
+      &lt;li&gt;packageName: com.example.flavor2&lt;/li&gt;
+      &lt;li&gt;minSdkVersion: 14&lt;/li&gt;
+      &lt;li&gt;versionCode: 10&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;通常，&lt;em&gt;Build Type&lt;/em&gt;配置会覆盖其他配置。例如&lt;em&gt;Build Type&lt;/em&gt;‘的&lt;code&gt;packageNameSuffix&lt;/code&gt;会添加到&lt;em&gt;Product Flavor&lt;/em&gt;‘的 &lt;code&gt;packageName&lt;/code&gt;上。&lt;/p&gt;
+
+&lt;p&gt;也有一些情况下，一个配置项可以同时在Build Type 和 Product Flavor都进行配置，这时，就要具体情况具体分析了。&lt;/p&gt;
+
+&lt;p&gt;例如，&lt;code&gt;signingConfig&lt;/code&gt;就是这样一个配置项。&lt;br /&gt;
+可以设置&lt;code&gt;android.buildTypes.release.signingConfig&lt;/code&gt;让所有release版本使用同一个&lt;em&gt;SigningConfig&lt;/em&gt;，也可以单独设置&lt;code&gt;android.productFlavors.*.signingConfig&lt;/code&gt;让各release使用各自的&lt;em&gt;SigningConfig&lt;/em&gt;。&lt;/p&gt;
+
+&lt;h3 id=&quot;sourcesets-and-dependencies-&quot;&gt;6.4 Sourcesets and Dependencies 源集合和依赖关系&lt;/h3&gt;
+
+&lt;p&gt;和&lt;em&gt;构建类型&lt;/em&gt;类似，产品flavor也可以通过他们自己的sourceSets影响最终的代码和资源&lt;/p&gt;
+
+&lt;p&gt;在上面的例子中，创建了四个sourceSet：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;android.sourceSets.flavor1&lt;br /&gt;
+  位置 &lt;code&gt;src/flavor1/&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;android.sourceSets.flavor2&lt;br /&gt;
+  位置 &lt;code&gt;src/flavor2/&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;android.sourceSets.androidTestFlavor1&lt;br /&gt;
+  位置 &lt;code&gt;src/androidTestFlavor1/&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;android.sourceSets.androidTestFlavor2&lt;br /&gt;
+  位置 &lt;code&gt;src/androidTestFlavor2/&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这些&lt;em&gt;sourceSet&lt;/em&gt; 都会用来创建apk，和&lt;code&gt;android.sourceSets.main&lt;/code&gt;以及构建类型的&lt;em&gt;sourceSet&lt;/em&gt;一起。&lt;/p&gt;
+
+&lt;p&gt;下面是构建apk时，所有&lt;em&gt;sourceSet&lt;/em&gt;的处理原则：  &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;所有文件夹里的源码(src/*/java)都会被合并起来构建一个输出。&lt;/li&gt;
+  &lt;li&gt;多个Manifest文件会合并成一个。这样使得flavor和构建类型一样，可以有不同的组件和permission&lt;/li&gt;
+  &lt;li&gt;所有资源的使用遵循优先级覆盖，Product Flavor资源覆盖main sourceSet资源，Build Type资源覆盖Product Flavor资源&lt;/li&gt;
+  &lt;li&gt;每个Build Variant会从资源中生成各自的R文件（或者其他生成的源码）。各个Build Variant不会共享任何东西。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;最后，和Build Type一样，Product Flavor还可以有自己的依赖。例如，flavor包含了一个广告版本和一个支付版本，那么就会依赖广告sdk，而其他版本不依赖。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;dependencies {
+    flavor1Compile &quot;...&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在这个特别的情况下，&lt;code&gt;src/flavor1/AndroidManifest.xml&lt;/code&gt;也许需要添加一个网络权限&lt;/p&gt;
+
+&lt;p&gt;每个variant也会包含额外的sourceset：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;android.sourceSets.flavor1Debug&lt;br /&gt;
+  位置 &lt;code&gt;src/flavor1Debug/&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;android.sourceSets.flavor1Release&lt;br /&gt;
+  位置 &lt;code&gt;src/flavor1Release/&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;android.sourceSets.flavor2Debug&lt;br /&gt;
+  位置 &lt;code&gt;src/flavor2Debug/&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;android.sourceSets.flavor2Release&lt;br /&gt;
+  位置 &lt;code&gt;src/flavor2Release/&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这些sourceset比build type的sourceset有更高的优先级，允许variant级别的定制。&lt;/p&gt;
+
+&lt;h3 id=&quot;building-and-tasks-&quot;&gt;6.5 Building and Tasks 构建和任务&lt;/h3&gt;
+
+&lt;p&gt;前面提到，每个Build Type有自己的&lt;code&gt;assemble&amp;lt;name&amp;gt;&lt;/code&gt;任务。但是Build Variant是Build Type 和 Product Flavor组合。&lt;/p&gt;
+
+&lt;p&gt;当使用Product Flavor的时候，更多的assemble-type任务会被创建出来，分别是：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;assemble&amp;lt;Variant Name&amp;gt;&lt;br /&gt;
+ 允许直接构建一个Variant版本，例如assembleFlavor1Debug。&lt;/li&gt;
+  &lt;li&gt;assemble&amp;lt;Build Type Name&amp;gt;&lt;br /&gt;
+ 允许构建指定Build Type的所有APK，例如assembleDebug将会构建Flavor1Debug和Flavor2Debug两个Variant版本。&lt;/li&gt;
+  &lt;li&gt;assemble&amp;lt;Product Flavor Name&amp;gt;&lt;br /&gt;
+ 允许构建指定flavor的所有APK，例如assembleFlavor1将会构建Flavor1Debug和Flavor1Release两个Variant版本。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;code&gt;assemble&lt;/code&gt;任务会构建所有可能的variant版本。&lt;/p&gt;
+
+&lt;h3 id=&quot;testing--1&quot;&gt;6.6 Testing 测试&lt;/h3&gt;
+
+&lt;p&gt;测试多flavor的项目和简单项目十分类似。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;androidTest&lt;/code&gt; sourceset被用来定义所有flavor的通用测试，同时，每个flavor也可以有各自的测试。&lt;/p&gt;
+
+&lt;p&gt;正如上面提到的，测试各flavor的sourceSet会被创建：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;android.sourceSets.androidTestFlavor1&lt;br /&gt;
+  位置 &lt;code&gt;src/androidTestFlavor1/&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;android.sourceSets.androidTestFlavor2&lt;br /&gt;
+  位置 &lt;code&gt;src/androidTestFlavor2/&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;同样，他们也可以有他们自己的依赖：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;dependencies {
+    androidTestFlavor1Compile &quot;...&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以通过锚点任务&lt;code&gt;deviceCheck&lt;/code&gt;来运行测试，或者&lt;code&gt;androidTest&lt;/code&gt;任务（当使用flavor时，它作为锚点任务）。&lt;/p&gt;
+
+&lt;p&gt;每个flavor有自己的任务运行测试：&lt;code&gt;androidTest&amp;lt;VariantName&amp;gt;&lt;/code&gt;。例如：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;androidTestFlavor1Debug&lt;/li&gt;
+  &lt;li&gt;androidTestFlavor2Debug&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;类似的，每个variant都有构建测试apk和安装/卸载任务。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;assembleFlavor1Test&lt;/li&gt;
+  &lt;li&gt;installFlavor1Debug&lt;/li&gt;
+  &lt;li&gt;installFlavor1Test&lt;/li&gt;
+  &lt;li&gt;uninstallFlavor1Debug&lt;/li&gt;
+  &lt;li&gt;…&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;最后，生成的HTML报告支持按照flavor合并。&lt;br /&gt;
+测试结果和报告位置如下，首先是每个flavor版本的，然后是合并的。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;build/androidTest-results/flavors/&lt;flavorname&gt;&lt;/flavorname&gt;&lt;/li&gt;
+  &lt;li&gt;build/androidTest-results/all/&lt;/li&gt;
+  &lt;li&gt;build/reports/androidTests/flavors&lt;flavorname&gt;&lt;/flavorname&gt;&lt;/li&gt;
+  &lt;li&gt;build/reports/androidTests/all/&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;改变任一个路径，只会影响根目录，仍然会为每个flavor和合并后的结果创建子目录。&lt;/p&gt;
+
+&lt;h3 id=&quot;multi-flavor-variants&quot;&gt;6.7 Multi-flavor variants&lt;/h3&gt;
+
+&lt;p&gt;某些情况下，应用可能需要基于多个标准来创建多个版本。&lt;/p&gt;
+
+&lt;p&gt;例如，Google Play中multi-apk支持4个不同的过滤器。为每一个过滤器而创建的apk要求使用多个Product Flavor维度。&lt;/p&gt;
+
+&lt;p&gt;假设有一个游戏项目，有demo和付费版本，想要使用multi-apk中的ABI过滤器。由于要兼顾3种ABI和两个版本，所以需要生成6个apk（没有计算多个Build Type产生的版本）。&lt;/p&gt;
+
+&lt;p&gt;然而，付费版本的代码对于所有三个ABI都是一样，因此创建简单的6个flavor不是一个好方法。&lt;/p&gt;
+
+&lt;p&gt;相反的，将flavor分为两个维度，并自动构建所有可能的组合variant。&lt;/p&gt;
+
+&lt;p&gt;这个功能通过Flavor Dimensions来实现。flavor都被分配到一个特定的维度&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    ...
+
+    flavorDimensions &quot;abi&quot;, &quot;version&quot;
+
+    productFlavors {
+        freeapp {
+            flavorDimension &quot;version&quot;
+            ...
+        }
+
+        x86 {
+            flavorDimension &quot;abi&quot;
+            ...
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在&lt;code&gt;android.flavorDimensions&lt;/code&gt;数组中定义可能的维度，并且每个flavor都指定一个维度。&lt;/p&gt;
+
+&lt;p&gt;根据已经划分维度的flavor([freeapp, paidapp] 和 [x86, arm, mips])，和Build Type[debug, release]，会创建以下variant：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;x86-freeapp-debug&lt;/li&gt;
+  &lt;li&gt;x86-freeapp-release&lt;/li&gt;
+  &lt;li&gt;arm-freeapp-debug&lt;/li&gt;
+  &lt;li&gt;arm-freeapp-release&lt;/li&gt;
+  &lt;li&gt;mips-freeapp-debug&lt;/li&gt;
+  &lt;li&gt;mips-freeapp-release&lt;/li&gt;
+  &lt;li&gt;x86-paidapp-debug&lt;/li&gt;
+  &lt;li&gt;x86-paidapp-release&lt;/li&gt;
+  &lt;li&gt;arm-paidapp-debug&lt;/li&gt;
+  &lt;li&gt;arm-paidapp-release&lt;/li&gt;
+  &lt;li&gt;mips-paidapp-debug&lt;/li&gt;
+  &lt;li&gt;mips-paidapp-release&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code&gt;android.flavorDimensions&lt;/code&gt;中定义维度的顺序非常重要。&lt;/p&gt;
+
+&lt;p&gt;每个variant配置由多个Product Flavor对象决定：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;android.defaultConfig&lt;/li&gt;
+  &lt;li&gt;One from the abi dimension&lt;/li&gt;
+  &lt;li&gt;One from the version dimension&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;维度的顺序决定哪个flavor的配置会覆盖另一个，这对资源来说很重要，高优先级flavor中的资源会替换低优先级的。flavor维度定义时高优先级在前。所以上面的例子中：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;abi &amp;gt; version &amp;gt; defaultConfig
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;多维flavor项目也有额外的sourceset，和variant类似，但是没有build type：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;android.sourceSets.x86Freeapp
+  Location &lt;code&gt;src/x86Freeapp/&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;android.sourceSets.armPaidapp
+  Location &lt;code&gt;src/armPaidapp/&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;etc…&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这些sourceset允许在flavor-combination的级别进行定制。他们比基础的flavor sourceset优先级高，但是比build type sourceset优先级低。&lt;/p&gt;
+
+&lt;h2 id=&quot;advanced-build-customization&quot;&gt;7 Advanced Build Customization&lt;/h2&gt;
+
+&lt;h3 id=&quot;build-options&quot;&gt;7.1 Build options&lt;/h3&gt;
+
+&lt;h4 id=&quot;java-compilation-options&quot;&gt;7.1.1 Java Compilation options&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    compileOptions {
+        sourceCompatibility = &quot;1.6&quot;
+        targetCompatibility = &quot;1.6&quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;默认值是1.6。影响所有编译java源码的任务。&lt;/p&gt;
+
+&lt;h4 id=&quot;aapt-options&quot;&gt;7.1.2 aapt options&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    aaptOptions {
+        noCompress &#39;foo&#39;, &#39;bar&#39;
+        ignoreAssetsPattern &quot;!.svn:!.git:!.ds_store:!*.scc:.*:&amp;lt;dir&amp;gt;_*:!CVS:!thumbs.db:!picasa.ini:!*~&quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;影响所有使用aapt的任务。&lt;/p&gt;
+
+&lt;h5 id=&quot;dex-options&quot;&gt;7.1.3 dex options&lt;/h5&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    dexOptions {
+        incremental false
+        preDexLibraries = false
+        jumboMode = false
+        javaMaxHeapSize &quot;2048M&quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;影响所有使用dex的任务。&lt;/p&gt;
+
+&lt;h3 id=&quot;manipulating-tasks&quot;&gt;7.2 Manipulating tasks&lt;/h3&gt;
+
+&lt;p&gt;基础的Java项目有一套有限的任务共同工作来生成输出。&lt;br /&gt;
+&lt;code&gt;classes&lt;/code&gt;任务是一个编译Java源码的任务。&lt;/p&gt;
+
+&lt;p&gt;很容易在&lt;code&gt;build.gradle&lt;/code&gt;文件的脚本中用&lt;code&gt;classes&lt;/code&gt;调用。这是&lt;code&gt;project.tasks.classes&lt;/code&gt;的缩写。&lt;/p&gt;
+
+&lt;p&gt;在Android项目中，情况就有点复杂，因为存在大量同样的任务，他们的名字是基于Build Type 和 Product Flavor生成的。&lt;/p&gt;
+
+&lt;p&gt;为了解决这个问题，&lt;code&gt;android&lt;/code&gt;有两个属性：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;applicationVariants (只适用于 app plugin)&lt;/li&gt;
+  &lt;li&gt;libraryVariants (只适用于 library plugin)&lt;/li&gt;
+  &lt;li&gt;testVariants (两者都适用)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这三者分别返回一个&lt;code&gt;ApplicationVariant&lt;/code&gt;, &lt;code&gt;LibraryVariant&lt;/code&gt;, 和 &lt;code&gt;TestVariant&lt;/code&gt;对象的&lt;a href=&quot;http://www.gradle.org/docs/current/javadoc/org/gradle/api/DomainObjectCollection.html&quot;&gt;DomainObjectCollection&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;要注意使用这些collection中的任一个都会触发创建所有的任务。这意味着使用collection之后不应该修改配置。&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;DomainObjectCollection&lt;/code&gt;可以直接访问所有对象，或者通过过滤器筛选（更方便）。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android.applicationVariants.each { variant -&amp;gt;
+    ....
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;所有三种variant共享下面这些属性：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Property Name&lt;/th&gt;
+      &lt;th&gt;Property Type&lt;/th&gt;
+      &lt;th&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;name&lt;/td&gt;
+      &lt;td&gt;String&lt;/td&gt;
+      &lt;td&gt;variant的名字，必须是唯一的&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;description&lt;/td&gt;
+      &lt;td&gt;String&lt;/td&gt;
+      &lt;td&gt;variant的描述&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;dirName&lt;/td&gt;
+      &lt;td&gt;String&lt;/td&gt;
+      &lt;td&gt;Variant的子文件夹名，必须是唯一的。可能也会有多个子文件夹，例如“debug/flavor1”&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;baseName&lt;/td&gt;
+      &lt;td&gt;String&lt;/td&gt;
+      &lt;td&gt;variant输出的基本名字，必须唯一&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;outputFile&lt;/td&gt;
+      &lt;td&gt;File&lt;/td&gt;
+      &lt;td&gt;Variant的输出，这是一个可读写的属性&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;processManifest&lt;/td&gt;
+      &lt;td&gt;ProcessManifest&lt;/td&gt;
+      &lt;td&gt;处理Manifest的任务&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;aidlCompile&lt;/td&gt;
+      &lt;td&gt;AidlCompile&lt;/td&gt;
+      &lt;td&gt;编译AIDL文件的的任务&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;renderscriptCompile&lt;/td&gt;
+      &lt;td&gt;RenderscriptCompile&lt;/td&gt;
+      &lt;td&gt;编译Renderscript文件的任务&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;mergeResources&lt;/td&gt;
+      &lt;td&gt;MergeResources&lt;/td&gt;
+      &lt;td&gt;合并资源文件的任务&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;mergeAssets&lt;/td&gt;
+      &lt;td&gt;MergeAssets&lt;/td&gt;
+      &lt;td&gt;合并asset的任务&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;processResources&lt;/td&gt;
+      &lt;td&gt;ProcessAndroidResources&lt;/td&gt;
+      &lt;td&gt;处理并编译资源文件的任务&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;generateBuildConfig&lt;/td&gt;
+      &lt;td&gt;GenerateBuildConfig&lt;/td&gt;
+      &lt;td&gt;生成BuildConfig类的任务&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;javaCompile&lt;/td&gt;
+      &lt;td&gt;JavaCompile&lt;/td&gt;
+      &lt;td&gt;编译Java源代码的任务&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;processJavaResources&lt;/td&gt;
+      &lt;td&gt;Copy&lt;/td&gt;
+      &lt;td&gt;处理Java资源文件的任务&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;assemble&lt;/td&gt;
+      &lt;td&gt;DefaultTask&lt;/td&gt;
+      &lt;td&gt;variant的标志任务assemble&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;code&gt;ApplicationVariant&lt;/code&gt;拥有以下额外属性：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Property Name&lt;/th&gt;
+      &lt;th&gt;Property Type&lt;/th&gt;
+      &lt;th&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;buildType&lt;/td&gt;
+      &lt;td&gt;BuildType&lt;/td&gt;
+      &lt;td&gt;variant的构建类型&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;productFlavors&lt;/td&gt;
+      &lt;td&gt;List&lt;productflavor&gt;&lt;/productflavor&gt;&lt;/td&gt;
+      &lt;td&gt;Variant的ProductFlavor。一般不为空但允许空值&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;mergedFlavor&lt;/td&gt;
+      &lt;td&gt;ProductFlavor&lt;/td&gt;
+      &lt;td&gt;android.defaultConfig和variant.productFlavors的合并&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;signingConfig&lt;/td&gt;
+      &lt;td&gt;SigningConfig&lt;/td&gt;
+      &lt;td&gt;variant使用的SigningConfig对象&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;isSigningReady&lt;/td&gt;
+      &lt;td&gt;boolean&lt;/td&gt;
+      &lt;td&gt;如果是true则表明这个variant已经具备了签名所需的所有信息&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;testVariant&lt;/td&gt;
+      &lt;td&gt;BuildVariant&lt;/td&gt;
+      &lt;td&gt;将会测试这个variant的TestVariant&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;dex&lt;/td&gt;
+      &lt;td&gt;Dex&lt;/td&gt;
+      &lt;td&gt;将代码打包成dex的任务，库工程该属性可以为空&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;packageApplication&lt;/td&gt;
+      &lt;td&gt;PackageApplication&lt;/td&gt;
+      &lt;td&gt;打包出最终apk的任务，库工程该属性可以为空&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;zipAlign&lt;/td&gt;
+      &lt;td&gt;ZipAlign&lt;/td&gt;
+      &lt;td&gt;对apk进行对齐(zipalign)的任务，库工程或者apk无法签名时，该属性可以为空&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;install&lt;/td&gt;
+      &lt;td&gt;DefaultTask&lt;/td&gt;
+      &lt;td&gt;安装apk的任务，可以为空&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;uninstall&lt;/td&gt;
+      &lt;td&gt;DefaultTask&lt;/td&gt;
+      &lt;td&gt;卸载任务&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;code&gt;LibraryVariant&lt;/code&gt;拥有以下额外属性：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Property Name&lt;/th&gt;
+      &lt;th&gt;Property Type&lt;/th&gt;
+      &lt;th&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;buildType&lt;/td&gt;
+      &lt;td&gt;BuildType&lt;/td&gt;
+      &lt;td&gt;variant的构建类型&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;mergedFlavor&lt;/td&gt;
+      &lt;td&gt;ProductFlavor&lt;/td&gt;
+      &lt;td&gt;The defaultConfig values&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;testVariant&lt;/td&gt;
+      &lt;td&gt;BuildVariant&lt;/td&gt;
+      &lt;td&gt;用于测试这个variant的Variant&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;packageLibrary&lt;/td&gt;
+      &lt;td&gt;Zip&lt;/td&gt;
+      &lt;td&gt;打包成库工程AAR文件的任务，非库工程该属性为空&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;code&gt;TestVariant&lt;/code&gt;拥有以下额外属性：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Property Name&lt;/th&gt;
+      &lt;th&gt;Property Type&lt;/th&gt;
+      &lt;th&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;buildType&lt;/td&gt;
+      &lt;td&gt;BuildType&lt;/td&gt;
+      &lt;td&gt;variant的构建类型&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;productFlavors&lt;/td&gt;
+      &lt;td&gt;List&lt;productflavor&gt;&lt;/productflavor&gt;&lt;/td&gt;
+      &lt;td&gt;Variant的ProductFlavor。一般不为空但允许空值&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;mergedFlavor&lt;/td&gt;
+      &lt;td&gt;ProductFlavor&lt;/td&gt;
+      &lt;td&gt;android.defaultConfig和variant.productFlavors的合并&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;signingConfig&lt;/td&gt;
+      &lt;td&gt;SigningConfig&lt;/td&gt;
+      &lt;td&gt;variant使用的SigningConfig对象&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;isSigningReady&lt;/td&gt;
+      &lt;td&gt;boolean&lt;/td&gt;
+      &lt;td&gt;如果是true则表明这个variant已经具备了签名所需的所有信息&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;testedVariant&lt;/td&gt;
+      &lt;td&gt;BaseVariant&lt;/td&gt;
+      &lt;td&gt;被当前TestVariant测试的BaseVariant&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;dex&lt;/td&gt;
+      &lt;td&gt;Dex&lt;/td&gt;
+      &lt;td&gt;将代码打包成dex的任务，库工程该属性可以为空&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;packageApplication&lt;/td&gt;
+      &lt;td&gt;PackageApplication&lt;/td&gt;
+      &lt;td&gt;打包出最终apk的任务，库工程该属性可以为空&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;zipAlign&lt;/td&gt;
+      &lt;td&gt;ZipAlign&lt;/td&gt;
+      &lt;td&gt;对apk进行对齐(zipalign)的任务，库工程或者apk无法签名时，该属性可以为空&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;install&lt;/td&gt;
+      &lt;td&gt;DefaultTask&lt;/td&gt;
+      &lt;td&gt;安装apk的任务，可以为空&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;uninstall&lt;/td&gt;
+      &lt;td&gt;DefaultTask&lt;/td&gt;
+      &lt;td&gt;卸载任务&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;connectedAndroidTest&lt;/td&gt;
+      &lt;td&gt;DefaultTask&lt;/td&gt;
+      &lt;td&gt;在已连接的设备上运行android测试的任务&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;providerAndroidTest&lt;/td&gt;
+      &lt;td&gt;DefaultTask&lt;/td&gt;
+      &lt;td&gt;使用扩展API运行android测试的任务&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;API for Android specific task types.&lt;/p&gt;
+
+&lt;p&gt;android特有任务的API：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;ProcessManifest
+    &lt;ul&gt;
+      &lt;li&gt;File manifestOutputFile&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;AidlCompile
+    &lt;ul&gt;
+      &lt;li&gt;File sourceOutputDir&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;RenderscriptCompile
+    &lt;ul&gt;
+      &lt;li&gt;File sourceOutputDir&lt;/li&gt;
+      &lt;li&gt;File resOutputDir&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;MergeResources
+    &lt;ul&gt;
+      &lt;li&gt;File outputDir&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;MergeAssets
+    &lt;ul&gt;
+      &lt;li&gt;File outputDir&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;ProcessAndroidResources
+    &lt;ul&gt;
+      &lt;li&gt;File manifestFile&lt;/li&gt;
+      &lt;li&gt;File resDir&lt;/li&gt;
+      &lt;li&gt;File assetsDir&lt;/li&gt;
+      &lt;li&gt;File sourceOutputDir&lt;/li&gt;
+      &lt;li&gt;File textSymbolOutputDir&lt;/li&gt;
+      &lt;li&gt;File packageOutputFile&lt;/li&gt;
+      &lt;li&gt;File proguardOutputFile&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;GenerateBuildConfig
+    &lt;ul&gt;
+      &lt;li&gt;File sourceOutputDir&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Dex
+    &lt;ul&gt;
+      &lt;li&gt;File outputFolder&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;PackageApplication
+    &lt;ul&gt;
+      &lt;li&gt;File resourceFile&lt;/li&gt;
+      &lt;li&gt;File dexFile&lt;/li&gt;
+      &lt;li&gt;File javaResourceDir&lt;/li&gt;
+      &lt;li&gt;File jniDir&lt;/li&gt;
+      &lt;li&gt;File outputFile
+        &lt;ul&gt;
+          &lt;li&gt;直接在Variant对象中使用“outputFile”可以改变最终的输出文件。&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;ZipAlign
+    &lt;ul&gt;
+      &lt;li&gt;File inputFile&lt;/li&gt;
+      &lt;li&gt;File outputFile
+        &lt;ul&gt;
+          &lt;li&gt;直接在Variant对象中使用“outputFile”可以改变最终的输出文件。&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;由于Gradle的工作方式和Android plugin的配置方式， 每个task类型的API是受限的。  &lt;br /&gt;
+首先，Gradle使得任务只能配置输入输出的路径和一些可能使用的选项标识。因此，任务只定义一些输入或者输出。&lt;/p&gt;
+
+&lt;p&gt;其次，大多数任务的输入都很复杂，一般都混合了sourceSet、Build Type和Product Flavor中的值。为了保持构建文件的简单，可读，我们的目标是让开发者通过略微改动DSL对象来修改构建过程，而不是深入到输入文件和任务选项中去。&lt;/p&gt;
+
+&lt;p&gt;另外需要注意，除了ZipAlign这个任务类型，其它所有类型都要求设置私有数据来让它们运行。这意味着不能手动创建这些任务的实例。&lt;/p&gt;
+
+&lt;p&gt;这些API也可能改变。大体来说，当前的API是围绕着修改任务的输入（可能的话）和输出来添加额外的处理过程（必要的话）。欢迎反馈，特别是那些没有预见到的问题。&lt;/p&gt;
+
+&lt;p&gt;对于Gradle任务(DefaultTask, JavaCompile, Copy, Zip)，请参考Gradle文档。&lt;/p&gt;
+
+&lt;h3 id=&quot;buildtype-and-product-flavor-property-reference-buildtypeproduct-flavor&quot;&gt;7.3 BuildType and Product Flavor property reference （BuildType和Product Flavor属性参考）&lt;/h3&gt;
+
+&lt;p&gt;敬请期待。  &lt;br /&gt;
+对于Gradle任务(DefaultTask, JavaCompile, Copy, Zip)，请参考Gradle文档。&lt;/p&gt;
+
+&lt;h3 id=&quot;using-sourcecompatibility-17-jdk17sourcecompatibility&quot;&gt;7.4 Using sourceCompatibility 1.7 使用（JDK）1.7版本的sourceCompatibility）&lt;/h3&gt;
+
+&lt;p&gt;使用Android KitKat（buildTools v19）就可以使用diamond operator，multi-catch，在switch中使用字符串，try with resource等等（jdk7中的新特性），要使用这些，需要修改你的构建文件如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    compileSdkVersion 19
+    buildToolsVersion &quot;19.0.0&quot;
+
+    defaultConfig {
+        minSdkVersion 7
+        targetSdkVersion 19
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;注意：你可以将minSdkVersion的值设置为19之前的版本，只是你只能使用除了try with resources之外的语言特性。如果你想要使用try with resources特性，你就需要把minSdkVersion也设置为19。&lt;/p&gt;
+
+&lt;p&gt;你同样也需要确认Gradle使用1.7或者更高版本的JDK。（Android Gradle plugin也需要0.6.1或者更高的版本）&lt;/p&gt;
+
+</description>
+                <link>http://rinvay.github.io/android/2015/03/26/Gradle-Plugin-User-Guide(Translation)</link>
+                <guid>http://rinvay.github.io/android/2015/03/26/Gradle-Plugin-User-Guide(Translation)</guid>
+                <pubDate>2015-03-26T00:00:00+08:00</pubDate>
+        </item>
+
+
+</channel>
+</rss>
