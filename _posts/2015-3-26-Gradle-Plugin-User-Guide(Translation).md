@@ -2,9 +2,11 @@
 layout: post
 category: android
 title: Gradle插件用户指南(译)
+toc: true
 tagline: by Rinvay.T
 tags: [android, gradle]
 ---
+
 
 > 原文[Gradle Plugin User Guide - Android Tools Project Site](http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Introduction)  
 > samples see bottom of [New Build System](http://tools.android.com/tech-docs/new-build-system)  
@@ -19,7 +21,7 @@ tags: [android, gradle]
 新构建系统的目标是：
 
 + 使得代码和资源的重用更加简单
-+ 使得创建同一应用程序的不同版本更加容易，不管是多个apk版本还是同一版本的多种定制
+- 使得创建同一应用程序的不同版本更加容易，不管是多个apk版本还是同一版本的多种定制
 + 使得配置，扩展和自定义构建更加容易
 + 良好的IDE集成
 
@@ -379,7 +381,7 @@ Android插件提供了大量DSL来直接从构建系统中定制大多数事情�
 
 如果这个值是null，那么在构建过程中会被第三列的默认值替代，但是DSL元素不会包含这个默认值(第三列的值)，所以你查询不到这个值。这是为了防止解析应用的manifest文件，除非真的必要。
 
-#### 3.4.2 Build Types 构建类型
+#### 3.4.2 构建类型(Build Types)
 
 默认情况下，Android插件会自动设置项目同时构建debug和release版本的应用程序。  
 这两个版本的不同之处主要在于能否在一个安全设备上调试程序，和APK如何签名。
@@ -470,7 +472,7 @@ Tip: 你可以在命令行下输入`gradle aJ`来运行`assembleJnidebug`任务�
 - 源码作为另一个源码目录
 - 资源叠加到main的资源中，取代已经存在的值
 
-#### 3.4.3 Signing Configurations 签名配置
+#### 3.4.3 签名配置
 
 对一个应用程序签名需要以下：
 
@@ -526,7 +528,7 @@ debug keystore位于`$HOME/.android/debug.keystore`，如果没有的话会自�
 [http://stackoverflow.com/questions/18328730/how-to-create-a-release-signed-apk-file-using-gradle][3]  
 我们以后会更新指南，提供更多的细节**
 
-#### 3.4.4 Running ProGuard 运行ProGuard
+#### 3.4.4 运行ProGuard
 
 ProGuard从Gradle plugin for ProGuard 4.10开始支持的(since Gradle plugin 0.4)。如果构建类型的`minifyEnabled`属性被设置为true，那么Progruard插件会自动被添加进来，对应的任务也自动被创建。
 
@@ -560,9 +562,7 @@ SDK中有两个默认的规则文件：
 
 它们位于sdk路径下，使用*getDefaultProguardFile()*可以获取文件的完整路径。它们除了是否要进行优化之外，其它都是相同的。
 
-#### 3.4.5 Shrinking Resources 压缩资源文件
-
-You can also remove unused resources, automatically, at build time. For more information, see the Resource Shrinking document.
+#### 3.4.5 压缩资源文件
 
 构建时可以自动移除没有被使用的资源文件。更多详细信息请查看文档[资源文件压缩](http://tools.android.com/tech-docs/new-build-system/resource-shrinking)
 
@@ -797,15 +797,15 @@ Gradle有默认文件的概念。下面这个就使用了默认文件：
 
 **重要:** 当开启了无默认版本发布，Maven发布插件会把这些额外的版本作为扩展包（按分类器）发布。这意味着并不是真正兼容地发布到maven仓库。你应该发布一个独立的vatiant到仓库，或者开启发布所有配置来支持跨项目依赖。
 
-##5 Testing 测试
+##5 测试
 
 构建一个测试应用已经内置在应用项目内。不需要再创建单独的测试项目。
 
-###5.1 Unit Testing 单元测试
+###5.1 单元测试
 
 试验性的单元测试功能支持已经加入到1.1中，具体请看[这个页面](http://tools.android.com/tech-docs/unit-testing-support)。本节其他部分讲述的是"instrumentation tests"
 
-###5.2 Basics and Configuration
+###5.2 基础和配置
 
 正如前面提到的，紧邻着`main` *sourceSet* 的就是 `androidTest` *sourceSet*，默认在`src/androidTest/`路径下。
 
@@ -855,7 +855,7 @@ Gradle有默认文件的概念。下面这个就使用了默认文件：
     }
 
 
-###5.3 Running tests 运行测试
+###5.3 运行测试
 
 正如前面提到的，检查通过锚点任务`connectedCheck`启动，这需要一个设备已连接。  
 这个过程依赖于androidTest任务，因此将会运行androidTest。这个task将会执行下面内容：  
@@ -888,7 +888,7 @@ Gradle有默认文件的概念。下面这个就使用了默认文件：
 
 `android.testOptions.resultsDir`由Project.file(String)获得。
 
-###5.4 Testing Android Libraries 测试Android库
+###5.4 测试Android库
 
 测试Android库项目的方法与应用项目的测试方法基本一样。
 
@@ -900,15 +900,12 @@ Gradle有默认文件的概念。下面这个就使用了默认文件：
 
 其它的部分都是类似的。
 
-###5.5 Test reports 测试报告
-
-When running unit tests, Gradle outputs an HTML report to easily look at the results.
-The Android plugins build on this and extends the HTML report to aggregate the results from all connected devices.
+###5.5 测试报告
 
 当运行单元测试的时候，Gradle会输出一份HTML格式的报告以方便查看结果。    
 Android plugin也是基于此，并且扩展了HTML报告文件，它将所有连接设备的报告都合并到一个文件里面。
 
-####5.5.1 Single projects 独立项目
+####5.5.1 独立项目
 
 项目将会自动生成测试运行，测试报告默认位置：
 
@@ -932,13 +929,9 @@ Android plugin也是基于此，并且扩展了HTML报告文件，它将所有�
 
 报告将会合并运行在不同设备上的测试结果。
 
-#### 5.5.2 Multi-projects reports 
-
-In a multi project setup with application(s) and library(ies) projects, when running all tests at the same time, it might be useful to generate a single reports for all tests.
+#### 5.5.2 多项目测试报告
 
 在一个配置了多个应用或者多个库项目的项目中，当同时运行所有测试的时候，生成一个单一报告文件记录所有的测试可能是非常有用的。
-
-To do this, a different plugin is available in the same artifact. It can be applied with:
 
 为了实现这个目的，需要使用同一个依赖文件中的另一个插件。可以通过以下方式添加：
 
@@ -966,9 +959,7 @@ To do this, a different plugin is available in the same artifact. It can be appl
 
 注意：`--continue` 选项将允许所有测试，即使子项目中的任何一个运行失败都不会停止。如果没有这个选项，第一个失败测试将会终止全部测试的运行，这可能导致一些项目没有执行过它们的测试。
 
-### 5.6 Lint support
-
-As of version 0.7.0, you can run lint for a specific variant, or for all variants, in which case it produces a report which describes which specific variants a given issue applies to.
+### 5.6 Lint支持
 
 从0.7.0版本开始，你可以为项目中一个特定的variant版本运行lint，也可以为所有variant版本都运行lint。它将会生成一个报告描述哪一个variant版本中存在着问题。
 
@@ -1030,7 +1021,7 @@ As of version 0.7.0, you can run lint for a specific variant, or for all variant
     }
 
 
-##6 Build Variants 构建不同版本
+##6 构建不同版本(Build Variants)
 
 新构建系统的一个目标就是为一个应用构建不同的版本。
 
@@ -1042,7 +1033,7 @@ As of version 0.7.0, you can run lint for a specific variant, or for all variant
 
 也就是说，从同一个项目中生成这些不同的apk，而不是使用一个库工程和2个以上的主应用工程。
 
-###6.1 Product flavors 产品定制
+###6.1 产品定制(Product flavors)
 
 一个`product flavor`定义了项目构建输出的一个自定义应用版本。一个单独项目可以有不同的flavor，来生成不同的应用。
 
@@ -1069,7 +1060,7 @@ flavor使用`productFlavors` 这个DSL容器来声明：
 这里创建了两个flavor，分别是 `flavor1` 和 `flavor2`。  
 **注意：** flavor的名字不能喝已有的*构建类型(Build Type)*名字冲突，或者和`androidTest`这个*sourceSet*的名字冲突。
 
-###6.2 Build Type + Product Flavor = Build Variant 构建类型＋产品定制＝变种版本
+###6.2 构建类型＋产品定制＝变种版本(Build Type + Product Flavor = Build Variant)
 
 前面已经提到，每一个构建类型都会生成一个apk。*忘了的话，请看3.4.2*
 
@@ -1086,7 +1077,7 @@ flavor使用`productFlavors` 这个DSL容器来声明：
 
 没有flavor的项目也有*Build Variants*，使用默认的没有名字的flavor配置，使得*Build Variants*列表看起来和 *Build Types*一样。
 
-###6.3 Product Flavor Configuration 产品Flavor配置
+###6.3  ProductFlavor配置
 
 每个flavor在下面这样的闭包结构中配置：
 
@@ -1133,7 +1124,7 @@ flavor使用`productFlavors` 这个DSL容器来声明：
 例如，`signingConfig`就是这样一个配置项。  
 可以设置`android.buildTypes.release.signingConfig`让所有release版本使用同一个*SigningConfig*，也可以单独设置`android.productFlavors.*.signingConfig`让各release使用各自的*SigningConfig*。
 
-### 6.4 Sourcesets and Dependencies 源集合和依赖关系
+### 6.4 源集合和依赖关系
 
 和*构建类型*类似，产品flavor也可以通过他们自己的sourceSets影响最终的代码和资源
 
@@ -1181,7 +1172,7 @@ flavor使用`productFlavors` 这个DSL容器来声明：
 这些sourceset比build type的sourceset有更高的优先级，允许variant级别的定制。
 
 
-### 6.5 Building and Tasks 构建和任务
+### 6.5 构建和任务
 
 前面提到，每个Build Type有自己的`assemble<name>`任务。但是Build Variant是Build Type 和 Product Flavor组合。
 
@@ -1196,7 +1187,7 @@ flavor使用`productFlavors` 这个DSL容器来声明：
 
 `assemble`任务会构建所有可能的variant版本。
 
-### 6.6 Testing 测试
+### 6.6 测试
 
 测试多flavor的项目和简单项目十分类似。
 
@@ -1242,7 +1233,7 @@ flavor使用`productFlavors` 这个DSL容器来声明：
 
 改变任一个路径，只会影响根目录，仍然会为每个flavor和合并后的结果创建子目录。
 
-### 6.7 Multi-flavor variants 
+### 6.7 多flaver维度的版本(Multi-flavor variants)
 
 某些情况下，应用可能需要基于多个标准来创建多个版本。
 
@@ -1315,11 +1306,11 @@ flavor使用`productFlavors` 这个DSL容器来声明：
 
 这些sourceset允许在flavor-combination的级别进行定制。他们比基础的flavor sourceset优先级高，但是比build type sourceset优先级低。
 
-## 7 Advanced Build Customization
+## 7 高级构建定制
 
-### 7.1 Build options
+### 7.1 构建选项
 
-#### 7.1.1 Java Compilation options
+#### 7.1.1 Java编译选项
 
 
     android {
@@ -1332,7 +1323,7 @@ flavor使用`productFlavors` 这个DSL容器来声明：
 
 默认值是1.6。影响所有编译java源码的任务。
 
-#### 7.1.2 aapt options
+#### 7.1.2 aapt选项
 
 
     android {
@@ -1345,7 +1336,7 @@ flavor使用`productFlavors` 这个DSL容器来声明：
 
 影响所有使用aapt的任务。
 
-##### 7.1.3 dex options
+##### 7.1.3 dex选项
 
 
     android {
@@ -1360,12 +1351,11 @@ flavor使用`productFlavors` 这个DSL容器来声明：
 
 影响所有使用dex的任务。
 
-### 7.2 Manipulating tasks
+### 7.2 修改构建任务
 
-基础的Java项目有一套有限的任务共同工作来生成输出。  
-`classes`任务是一个编译Java源码的任务。
-
-很容易在`build.gradle`文件的脚本中用`classes`调用。这是`project.tasks.classes`的缩写。
+基础的Java项目有一套有限的任务共同工作来生成输出。 
+ 
+`classes`任务是一个编译Java源码的任务。很容易在`build.gradle`文件的脚本中用`classes`调用。这是`project.tasks.classes`的缩写。
 
 在Android项目中，情况就有点复杂，因为存在大量同样的任务，他们的名字是基于Build Type 和 Product Flavor生成的。
 
@@ -1501,13 +1491,13 @@ android特有任务的API：
 
 对于Gradle任务(DefaultTask, JavaCompile, Copy, Zip)，请参考Gradle文档。
 
-### 7.3 BuildType and Product Flavor property reference （BuildType和Product Flavor属性参考）
+### 7.3 BuildType和Product Flavor属性参考）
 
 敬请期待。    
 对于Gradle任务(DefaultTask, JavaCompile, Copy, Zip)，请参考Gradle文档。
 
 
-### 7.4 Using sourceCompatibility 1.7 使用（JDK）1.7版本的sourceCompatibility）
+### 7.4 使用（JDK）1.7版本的sourceCompatibility）
 
 使用Android KitKat（buildTools v19）就可以使用diamond operator，multi-catch，在switch中使用字符串，try with resource等等（jdk7中的新特性），要使用这些，需要修改你的构建文件如下：
 

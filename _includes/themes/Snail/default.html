@@ -4,10 +4,10 @@
 	<meta charset="utf-8">
 	{% if page.group == 'home' %}
 	<title>{{ site.title }}</title>
-    {% if site.description %}<meta name="description" content="{{ site.description }}">{% endif %}
+	{% if site.description %}<meta name="description" content="{{ site.description }}">{% endif %}
 	{% else %}
 	<title>{{ page.title }}</title>
-    {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
+	{% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
 	{% endif %}
 	<meta name="author" content="{{ site.author.name }}">
 	
@@ -30,34 +30,95 @@
 	<script type="text/javascript" src="{{ ASSET_PATH }}/google-code-prettify/prettify.js"></script>
 	
 	<script type="text/javascript">
-	  $(function(){
-		$("pre code").addClass("prettyprint linenums");
-		prettyPrint();
-	  });
+		$(function(){
+			$("pre code").addClass("prettyprint linenums");
+			prettyPrint();
+		});
 	</script>
 	
 <!--[if lt IE 9]>
 	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-<![endif]-->
+	<![endif]-->
 
-<!-- atom & rss feed -->
-    <link href="{{ BASE_PATH }}{{ site.JB.atom_path }}" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
-    <link href="{{ BASE_PATH }}{{ site.JB.rss_path }}" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
-</head>
-<body>
-	<noscript>
-		&amp;lt;div id="no-js"&amp;gt;Please enable JavaScript in your browser to experience {{ HOME_PATH }} fully&amp;lt;/div&amp;gt;
-	</noscript>
-    <div id="page-container">
-		<div>
-			{% include themes/Snail/nav.html %}
-			<div id="page-content">
-				{{ content }}
+	<!-- atom & rss feed -->
+	<link href="{{ BASE_PATH }}{{ site.JB.atom_path }}" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+	<link href="{{ BASE_PATH }}{{ site.JB.rss_path }}" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+	
+	{% if page.toc == true %}
+	<!-- for markdown toc use https://github.com/i5ting/i5ting_ztree_toc -->
+	<script src="/assets/js/jquery-1.4.4.min.js"> </script>
+	<script src="/assets/js/jquery.ztree.core-3.5.min.js"> </script>
+	<script src="/assets/js/ztree_toc.js"> </script>
+	<link rel="stylesheet" href="/assets/css/zTreeStyle/zTreeStyle.css" type="text/css">
+	<SCRIPT type="text/javascript" >
+		<!--
+		$(document).ready(function(){
+			$('#tree').ztree_toc({
+				documment_selector:'#page-content',
+				debug:false,
+				is_auto_number:false,
+
+				ztreeStyle: {
+					width:'25%',
+					height:'99%',
+					overflow: 'auto',
+					position: 'fixed',
+					'z-index': 2147483647,
+					border: '0px none',
+					left: '0px',
+					top: '0px',
+
+				}
+			});
+		});
+			//-->
+		</SCRIPT>
+
+		<style type="text/css">
+			#page-container {
+				margin-left: 25%;
+				width: 75%;
+			}
+
+			#toc_container {
+				margin-bottom: 10px;
+				overflow: hidden;
+			}
+
+			footer .footer-940 {
+				margin: 10px 10% 0 25%;				
+			}
+		</style>
+
+		{% endif %}
+
+	</head>
+	<body>
+		<noscript>
+			&amp;lt;div id="no-js"&amp;gt;Please enable JavaScript in your browser to experience {{ HOME_PATH }} fully&amp;lt;/div&amp;gt;
+		</noscript>
+
+		<div id="page-container">
+			<div>
+				{% include themes/Snail/nav.html %}
+				<div id="page-content">
+					{{ content }}
+				</div>
+				<div class="clearboth pagebottom"></div>
 			</div>
-			<div class="clearboth pagebottom"></div>
+			
+
+			{% include themes/Snail/footer.html %}
+			{% include JB/analytics %}
+
 		</div>
-	</div>
-	{% include themes/Snail/footer.html %}
-	{% include JB/analytics %}
-</body>
-</html>
+
+		<div id="toc_container" style='width:25%;'>
+			<ul id="tree" class="ztree" style='width:100%'>
+
+			</ul>
+		</div>
+	</body>
+	</html>
+

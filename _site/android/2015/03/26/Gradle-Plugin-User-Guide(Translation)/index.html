@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	
 	<title>Gradle插件用户指南(译)</title>
-    
+	
 	
 	<meta name="author" content="Rinvay Tang">
 	
@@ -26,27 +26,78 @@
 	<script type="text/javascript" src="/assets/themes/Snail/google-code-prettify/prettify.js"></script>
 	
 	<script type="text/javascript">
-	  $(function(){
-		$("pre code").addClass("prettyprint linenums");
-		prettyPrint();
-	  });
+		$(function(){
+			$("pre code").addClass("prettyprint linenums");
+			prettyPrint();
+		});
 	</script>
 	
 <!--[if lt IE 9]>
 	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-<![endif]-->
+	<![endif]-->
 
-<!-- atom & rss feed -->
-    <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
-    <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
-</head>
-<body>
-	<noscript>
-		&amp;lt;div id="no-js"&amp;gt;Please enable JavaScript in your browser to experience / fully&amp;lt;/div&amp;gt;
-	</noscript>
-    <div id="page-container">
-		<div>
-			<nav>
+	<!-- atom & rss feed -->
+	<link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+	<link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+	
+	
+	<!-- for markdown toc use https://github.com/i5ting/i5ting_ztree_toc -->
+	<script src="/assets/js/jquery-1.4.4.min.js"> </script>
+	<script src="/assets/js/jquery.ztree.core-3.5.min.js"> </script>
+	<script src="/assets/js/ztree_toc.js"> </script>
+	<link rel="stylesheet" href="/assets/css/zTreeStyle/zTreeStyle.css" type="text/css">
+	<SCRIPT type="text/javascript" >
+		<!--
+		$(document).ready(function(){
+			$('#tree').ztree_toc({
+				documment_selector:'#page-content',
+				debug:false,
+				is_auto_number:false,
+
+				ztreeStyle: {
+					width:'25%',
+					height:'99%',
+					overflow: 'auto',
+					position: 'fixed',
+					'z-index': 2147483647,
+					border: '0px none',
+					left: '0px',
+					top: '0px',
+
+				}
+			});
+		});
+			//-->
+		</SCRIPT>
+
+		<style type="text/css">
+			#page-container {
+				margin-left: 25%;
+				width: 75%;
+			}
+
+			#toc_container {
+				margin-bottom: 10px;
+				overflow: hidden;
+			}
+
+			footer .footer-940 {
+				margin: 10px 10% 0 25%;				
+			}
+		</style>
+
+		
+
+	</head>
+	<body>
+		<noscript>
+			&amp;lt;div id="no-js"&amp;gt;Please enable JavaScript in your browser to experience / fully&amp;lt;/div&amp;gt;
+		</noscript>
+
+		<div id="page-container">
+			<div>
+				<nav>
 	<div id="nav-l">
 	</div>
 	<div id="nav-c">
@@ -128,8 +179,8 @@
 	<div id="nav-r">
 	</div>
 </nav>
-			<div id="page-content">
-				
+				<div id="page-content">
+					
 <div id="page-content">
 	<div class="cont932">
 	<div id="journal-articles-block">
@@ -621,7 +672,7 @@ android {
 
 <p>如果这个值是null，那么在构建过程中会被第三列的默认值替代，但是DSL元素不会包含这个默认值(第三列的值)，所以你查询不到这个值。这是为了防止解析应用的manifest文件，除非真的必要。</p>
 
-<h4 id="build-types-">3.4.2 Build Types 构建类型</h4>
+<h4 id="build-types">3.4.2 构建类型(Build Types)</h4>
 
 <p>默认情况下，Android插件会自动设置项目同时构建debug和release版本的应用程序。<br />
 这两个版本的不同之处主要在于能否在一个安全设备上调试程序，和APK如何签名。</p>
@@ -770,7 +821,7 @@ src/&lt;buildtypename&gt;/
   <li>资源叠加到main的资源中，取代已经存在的值</li>
 </ul>
 
-<h4 id="signing-configurations-">3.4.3 Signing Configurations 签名配置</h4>
+<h4 id="section-10">3.4.3 签名配置</h4>
 
 <p>对一个应用程序签名需要以下：</p>
 
@@ -827,7 +878,7 @@ debug keystore位于<code>$HOME/.android/debug.keystore</code>，如果没有的
 <a href="http://stackoverflow.com/questions/18328730/how-to-create-a-release-signed-apk-file-using-gradle">http://stackoverflow.com/questions/18328730/how-to-create-a-release-signed-apk-file-using-gradle</a><br />
 我们以后会更新指南，提供更多的细节</strong></p>
 
-<h4 id="running-proguard-proguard">3.4.4 Running ProGuard 运行ProGuard</h4>
+<h4 id="proguard">3.4.4 运行ProGuard</h4>
 
 <p>ProGuard从Gradle plugin for ProGuard 4.10开始支持的(since Gradle plugin 0.4)。如果构建类型的<code>minifyEnabled</code>属性被设置为true，那么Progruard插件会自动被添加进来，对应的任务也自动被创建。</p>
 
@@ -862,9 +913,7 @@ debug keystore位于<code>$HOME/.android/debug.keystore</code>，如果没有的
 
 <p>它们位于sdk路径下，使用<em>getDefaultProguardFile()</em>可以获取文件的完整路径。它们除了是否要进行优化之外，其它都是相同的。</p>
 
-<h4 id="shrinking-resources-">3.4.5 Shrinking Resources 压缩资源文件</h4>
-
-<p>You can also remove unused resources, automatically, at build time. For more information, see the Resource Shrinking document.</p>
+<h4 id="section-11">3.4.5 压缩资源文件</h4>
 
 <p>构建时可以自动移除没有被使用的资源文件。更多详细信息请查看文档<a href="http://tools.android.com/tech-docs/new-build-system/resource-shrinking">资源文件压缩</a></p>
 
@@ -872,9 +921,9 @@ debug keystore位于<code>$HOME/.android/debug.keystore</code>，如果没有的
 
 <p>Gradle项目可以依赖其它组件，这些组件可以是外部二进制包，或者其它Gradle项目。</p>
 
-<h3 id="section-10">4.1 依赖二进制包</h3>
+<h3 id="section-12">4.1 依赖二进制包</h3>
 
-<h4 id="section-11">4.1.1 本地包</h4>
+<h4 id="section-13">4.1.1 本地包</h4>
 
 <p>为了配置一个外部库jar依赖，你需要在<code>compile</code>配置中添加一个依赖</p>
 
@@ -909,7 +958,7 @@ android {
     <code>compile fileTree(dir: 'libs', include: ['*.jar'])</code></p>
 </blockquote>
 
-<h4 id="section-12">4.1.2 远程文件</h4>
+<h4 id="section-14">4.1.2 远程文件</h4>
 
 <p>Gradle支持从Maven或者Ivy仓库获取依赖文件。</p>
 
@@ -934,7 +983,7 @@ android {
 
 <p>更多关于配置依赖的信息，请查看<a href="http://gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html">Gradle用户指南</a>和<a href="http://gradle.org/docs/current/dsl/org.gradle.api.artifacts.dsl.DependencyHandler.html">DSL文档</a></p>
 
-<h3 id="section-13">4.2 多项目设置</h3>
+<h3 id="section-15">4.2 多项目设置</h3>
 
 <p>Gradle项目可以通过多项目设置依赖其它gradle项目。</p>
 
@@ -986,13 +1035,13 @@ android {
 
 <p>更多关于多项目设置的信息在<a href="http://gradle.org/docs/current/userguide/multi_project_builds.html">这里</a>。</p>
 
-<h3 id="section-14">4.3 库项目</h3>
+<h3 id="section-16">4.3 库项目</h3>
 
 <p>在上面的多项目设置中，<code>:libraries:lib1</code>和<code>:libraries:lib2</code>可能是Java项目，<code>:app</code>Android项目将会使用它们输出的jar文件。</p>
 
 <p>然而，如果你想要共享使用了Android API或者Android资源文件的代码(在库项目中使用了Android API或Android资源文件)，这些库项目就不能是常规的Java项目，必须是Android库项目。</p>
 
-<h4 id="section-15">4.3.1 创建一个库项目</h4>
+<h4 id="section-17">4.3.1 创建一个库项目</h4>
 
 <p>一个库项目和常规的Android项目很相似，只有很少的区别。</p>
 
@@ -1017,7 +1066,7 @@ android {
 
 <p>这是一个使用API 15编译的库项目。<code>SourceSets</code>和依赖关系的处理跟应用程序项目中一样，而且定制方式也一样。</p>
 
-<h4 id="section-16">4.3.2 普通项目和库项目的区别</h4>
+<h4 id="section-18">4.3.2 普通项目和库项目的区别</h4>
 
 <p>一个库项目的主要输出是一个<code>.aar</code>包（它代表Android的归档文件）。它包含编译好的源码（例如jar文件或者本地.so文件）以及资源文件（manifest, res, assets）。<br />
 一个库项目也可以生成一个测试apk来测试，而不依赖应用程序。</p>
@@ -1027,7 +1076,7 @@ android {
 <p>其余部分，库项目和应用程序项目一样。都有构建类型和product flavors，可以生成多个版本的aar。<br />
 要注意的是，多数Build Type配置不适用于库项目。然而，你可以定制<code>sourceSet</code>来改变所依赖库的内容，不论它是被普通项目使用还是被测试。</p>
 
-<h4 id="section-17">4.3.3 引用一个库项目</h4>
+<h4 id="section-19">4.3.3 引用一个库项目</h4>
 
 <p>引用一个库项目和引用其它项目的方式一样：  </p>
 
@@ -1039,7 +1088,7 @@ android {
 
 <p><strong>Note:</strong> 如果你由多个库项目，那么顺序是很重要的。这和旧构建系统中的<code>project.properties</code>文件中的依赖顺序一样重要。</p>
 
-<h4 id="section-18">4.3.4 库项目发布</h4>
+<h4 id="section-20">4.3.4 库项目发布</h4>
 
 <p>默认的情况下，库项目只会发布release变种版本(release variant)。这个版本会被所有引用了库项目的项目使用，不管它们自己构建的是什么版本。这是Gradle导致的限制，我们正努力消除这个限制。</p>
 
@@ -1087,15 +1136,15 @@ android {
 
 <p><strong>重要:</strong> 当开启了无默认版本发布，Maven发布插件会把这些额外的版本作为扩展包（按分类器）发布。这意味着并不是真正兼容地发布到maven仓库。你应该发布一个独立的vatiant到仓库，或者开启发布所有配置来支持跨项目依赖。</p>
 
-<h2 id="testing-">5 Testing 测试</h2>
+<h2 id="section-21">5 测试</h2>
 
 <p>构建一个测试应用已经内置在应用项目内。不需要再创建单独的测试项目。</p>
 
-<h3 id="unit-testing-">5.1 Unit Testing 单元测试</h3>
+<h3 id="section-22">5.1 单元测试</h3>
 
 <p>试验性的单元测试功能支持已经加入到1.1中，具体请看<a href="http://tools.android.com/tech-docs/unit-testing-support">这个页面</a>。本节其他部分讲述的是”instrumentation tests”</p>
 
-<h3 id="basics-and-configuration">5.2 Basics and Configuration</h3>
+<h3 id="section-23">5.2 基础和配置</h3>
 
 <p>正如前面提到的，紧邻着<code>main</code> <em>sourceSet</em> 的就是 <code>androidTest</code> <em>sourceSet</em>，默认在<code>src/androidTest/</code>路径下。</p>
 
@@ -1144,7 +1193,7 @@ android {
 }
 </code></pre>
 
-<h3 id="running-tests-">5.3 Running tests 运行测试</h3>
+<h3 id="section-24">5.3 运行测试</h3>
 
 <p>正如前面提到的，检查通过锚点任务<code>connectedCheck</code>启动，这需要一个设备已连接。<br />
 这个过程依赖于androidTest任务，因此将会运行androidTest。这个task将会执行下面内容：  </p>
@@ -1177,7 +1226,7 @@ android {
 
 <p><code>android.testOptions.resultsDir</code>由Project.file(String)获得。</p>
 
-<h3 id="testing-android-libraries-android">5.4 Testing Android Libraries 测试Android库</h3>
+<h3 id="android-2">5.4 测试Android库</h3>
 
 <p>测试Android库项目的方法与应用项目的测试方法基本一样。</p>
 
@@ -1189,15 +1238,12 @@ android {
 
 <p>其它的部分都是类似的。</p>
 
-<h3 id="test-reports-">5.5 Test reports 测试报告</h3>
-
-<p>When running unit tests, Gradle outputs an HTML report to easily look at the results.
-The Android plugins build on this and extends the HTML report to aggregate the results from all connected devices.</p>
+<h3 id="section-25">5.5 测试报告</h3>
 
 <p>当运行单元测试的时候，Gradle会输出一份HTML格式的报告以方便查看结果。  <br />
 Android plugin也是基于此，并且扩展了HTML报告文件，它将所有连接设备的报告都合并到一个文件里面。</p>
 
-<h4 id="single-projects-">5.5.1 Single projects 独立项目</h4>
+<h4 id="section-26">5.5.1 独立项目</h4>
 
 <p>项目将会自动生成测试运行，测试报告默认位置：</p>
 
@@ -1219,13 +1265,9 @@ Android plugin也是基于此，并且扩展了HTML报告文件，它将所有�
 
 <p>报告将会合并运行在不同设备上的测试结果。</p>
 
-<h4 id="multi-projects-reports">5.5.2 Multi-projects reports</h4>
-
-<p>In a multi project setup with application(s) and library(ies) projects, when running all tests at the same time, it might be useful to generate a single reports for all tests.</p>
+<h4 id="section-27">5.5.2 多项目测试报告</h4>
 
 <p>在一个配置了多个应用或者多个库项目的项目中，当同时运行所有测试的时候，生成一个单一报告文件记录所有的测试可能是非常有用的。</p>
-
-<p>To do this, a different plugin is available in the same artifact. It can be applied with:</p>
 
 <p>为了实现这个目的，需要使用同一个依赖文件中的另一个插件。可以通过以下方式添加：</p>
 
@@ -1251,9 +1293,7 @@ apply plugin: 'android-reporting'
 
 <p>注意：<code>--continue</code> 选项将允许所有测试，即使子项目中的任何一个运行失败都不会停止。如果没有这个选项，第一个失败测试将会终止全部测试的运行，这可能导致一些项目没有执行过它们的测试。</p>
 
-<h3 id="lint-support">5.6 Lint support</h3>
-
-<p>As of version 0.7.0, you can run lint for a specific variant, or for all variants, in which case it produces a report which describes which specific variants a given issue applies to.</p>
+<h3 id="lint">5.6 Lint支持</h3>
 
 <p>从0.7.0版本开始，你可以为项目中一个特定的variant版本运行lint，也可以为所有variant版本都运行lint。它将会生成一个报告描述哪一个variant版本中存在着问题。</p>
 
@@ -1314,7 +1354,7 @@ apply plugin: 'android-reporting'
 }
 </code></pre>
 
-<h2 id="build-variants-">6 Build Variants 构建不同版本</h2>
+<h2 id="build-variants">6 构建不同版本(Build Variants)</h2>
 
 <p>新构建系统的一个目标就是为一个应用构建不同的版本。</p>
 
@@ -1328,7 +1368,7 @@ apply plugin: 'android-reporting'
 
 <p>也就是说，从同一个项目中生成这些不同的apk，而不是使用一个库工程和2个以上的主应用工程。</p>
 
-<h3 id="product-flavors-">6.1 Product flavors 产品定制</h3>
+<h3 id="product-flavors">6.1 产品定制(Product flavors)</h3>
 
 <p>一个<code>product flavor</code>定义了项目构建输出的一个自定义应用版本。一个单独项目可以有不同的flavor，来生成不同的应用。</p>
 
@@ -1354,7 +1394,7 @@ apply plugin: 'android-reporting'
 <p>这里创建了两个flavor，分别是 <code>flavor1</code> 和 <code>flavor2</code>。<br />
 <strong>注意：</strong> flavor的名字不能喝已有的<em>构建类型(Build Type)</em>名字冲突，或者和<code>androidTest</code>这个<em>sourceSet</em>的名字冲突。</p>
 
-<h3 id="build-type--product-flavor--build-variant-">6.2 Build Type + Product Flavor = Build Variant 构建类型＋产品定制＝变种版本</h3>
+<h3 id="build-type--product-flavor--build-variant">6.2 构建类型＋产品定制＝变种版本(Build Type + Product Flavor = Build Variant)</h3>
 
 <p>前面已经提到，每一个构建类型都会生成一个apk。<em>忘了的话，请看3.4.2</em></p>
 
@@ -1373,7 +1413,7 @@ apply plugin: 'android-reporting'
 
 <p>没有flavor的项目也有<em>Build Variants</em>，使用默认的没有名字的flavor配置，使得<em>Build Variants</em>列表看起来和 <em>Build Types</em>一样。</p>
 
-<h3 id="product-flavor-configuration-flavor">6.3 Product Flavor Configuration 产品Flavor配置</h3>
+<h3 id="productflavor">6.3  ProductFlavor配置</h3>
 
 <p>每个flavor在下面这样的闭包结构中配置：</p>
 
@@ -1427,7 +1467,7 @@ apply plugin: 'android-reporting'
 <p>例如，<code>signingConfig</code>就是这样一个配置项。<br />
 可以设置<code>android.buildTypes.release.signingConfig</code>让所有release版本使用同一个<em>SigningConfig</em>，也可以单独设置<code>android.productFlavors.*.signingConfig</code>让各release使用各自的<em>SigningConfig</em>。</p>
 
-<h3 id="sourcesets-and-dependencies-">6.4 Sourcesets and Dependencies 源集合和依赖关系</h3>
+<h3 id="section-28">6.4 源集合和依赖关系</h3>
 
 <p>和<em>构建类型</em>类似，产品flavor也可以通过他们自己的sourceSets影响最终的代码和资源</p>
 
@@ -1479,7 +1519,7 @@ apply plugin: 'android-reporting'
 
 <p>这些sourceset比build type的sourceset有更高的优先级，允许variant级别的定制。</p>
 
-<h3 id="building-and-tasks-">6.5 Building and Tasks 构建和任务</h3>
+<h3 id="section-29">6.5 构建和任务</h3>
 
 <p>前面提到，每个Build Type有自己的<code>assemble&lt;name&gt;</code>任务。但是Build Variant是Build Type 和 Product Flavor组合。</p>
 
@@ -1496,7 +1536,7 @@ apply plugin: 'android-reporting'
 
 <p><code>assemble</code>任务会构建所有可能的variant版本。</p>
 
-<h3 id="testing--1">6.6 Testing 测试</h3>
+<h3 id="section-30">6.6 测试</h3>
 
 <p>测试多flavor的项目和简单项目十分类似。</p>
 
@@ -1549,7 +1589,7 @@ apply plugin: 'android-reporting'
 
 <p>改变任一个路径，只会影响根目录，仍然会为每个flavor和合并后的结果创建子目录。</p>
 
-<h3 id="multi-flavor-variants">6.7 Multi-flavor variants</h3>
+<h3 id="flavermulti-flavor-variants">6.7 多flaver维度的版本(Multi-flavor variants)</h3>
 
 <p>某些情况下，应用可能需要基于多个标准来创建多个版本。</p>
 
@@ -1628,11 +1668,11 @@ apply plugin: 'android-reporting'
 
 <p>这些sourceset允许在flavor-combination的级别进行定制。他们比基础的flavor sourceset优先级高，但是比build type sourceset优先级低。</p>
 
-<h2 id="advanced-build-customization">7 Advanced Build Customization</h2>
+<h2 id="section-31">7 高级构建定制</h2>
 
-<h3 id="build-options">7.1 Build options</h3>
+<h3 id="section-32">7.1 构建选项</h3>
 
-<h4 id="java-compilation-options">7.1.1 Java Compilation options</h4>
+<h4 id="java-1">7.1.1 Java编译选项</h4>
 
 <pre><code>android {
     compileOptions {
@@ -1644,7 +1684,7 @@ apply plugin: 'android-reporting'
 
 <p>默认值是1.6。影响所有编译java源码的任务。</p>
 
-<h4 id="aapt-options">7.1.2 aapt options</h4>
+<h4 id="aapt">7.1.2 aapt选项</h4>
 
 <pre><code>android {
     aaptOptions {
@@ -1656,7 +1696,7 @@ apply plugin: 'android-reporting'
 
 <p>影响所有使用aapt的任务。</p>
 
-<h5 id="dex-options">7.1.3 dex options</h5>
+<h5 id="dex">7.1.3 dex选项</h5>
 
 <pre><code>android {
     dexOptions {
@@ -1670,12 +1710,11 @@ apply plugin: 'android-reporting'
 
 <p>影响所有使用dex的任务。</p>
 
-<h3 id="manipulating-tasks">7.2 Manipulating tasks</h3>
+<h3 id="section-33">7.2 修改构建任务</h3>
 
-<p>基础的Java项目有一套有限的任务共同工作来生成输出。<br />
-<code>classes</code>任务是一个编译Java源码的任务。</p>
+<p>基础的Java项目有一套有限的任务共同工作来生成输出。 </p>
 
-<p>很容易在<code>build.gradle</code>文件的脚本中用<code>classes</code>调用。这是<code>project.tasks.classes</code>的缩写。</p>
+<p><code>classes</code>任务是一个编译Java源码的任务。很容易在<code>build.gradle</code>文件的脚本中用<code>classes</code>调用。这是<code>project.tasks.classes</code>的缩写。</p>
 
 <p>在Android项目中，情况就有点复杂，因为存在大量同样的任务，他们的名字是基于Build Type 和 Product Flavor生成的。</p>
 
@@ -2057,12 +2096,12 @@ apply plugin: 'android-reporting'
 
 <p>对于Gradle任务(DefaultTask, JavaCompile, Copy, Zip)，请参考Gradle文档。</p>
 
-<h3 id="buildtype-and-product-flavor-property-reference-buildtypeproduct-flavor">7.3 BuildType and Product Flavor property reference （BuildType和Product Flavor属性参考）</h3>
+<h3 id="buildtypeproduct-flavor">7.3 BuildType和Product Flavor属性参考）</h3>
 
 <p>敬请期待。  <br />
 对于Gradle任务(DefaultTask, JavaCompile, Copy, Zip)，请参考Gradle文档。</p>
 
-<h3 id="using-sourcecompatibility-17-jdk17sourcecompatibility">7.4 Using sourceCompatibility 1.7 使用（JDK）1.7版本的sourceCompatibility）</h3>
+<h3 id="jdk17sourcecompatibility">7.4 使用（JDK）1.7版本的sourceCompatibility）</h3>
 
 <p>使用Android KitKat（buildTools v19）就可以使用diamond operator，multi-catch，在switch中使用字符串，try with resource等等（jdk7中的新特性），要使用这些，需要修改你的构建文件如下：</p>
 
@@ -2119,14 +2158,15 @@ apply plugin: 'android-reporting'
 	<div class="clearboth"></div>
 </div>
 
+				</div>
+				<div class="clearboth pagebottom"></div>
 			</div>
-			<div class="clearboth pagebottom"></div>
-		</div>
-	</div>
-	<footer>
+			
+
+			<footer>
 	<div class="footer-940">
 		<div class="footer-general-info">
-			© 2014 Rinvay Tang.<br><br>
+			© 2015 Rinvay Tang.<br><br>
 			Content licensed under:<br>
 			<a class="cc" href="http://creativecommons.org/licenses/by-sa/3.0/">c a b</a><br>
 			<a href = "/about.html">About Me</a><br>
@@ -2245,7 +2285,16 @@ apply plugin: 'android-reporting'
 	</div>
 	<div class="clearboth"></div>
 </footer>
-	
-</body>
-</html>
+			
+
+		</div>
+
+		<div id="toc_container" style='width:25%;'>
+			<ul id="tree" class="ztree" style='width:100%'>
+
+			</ul>
+		</div>
+	</body>
+	</html>
+
 
