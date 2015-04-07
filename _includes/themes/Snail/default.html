@@ -105,6 +105,11 @@
 				<div id="page-content">
 					{{ content }}
 				</div>
+				<section class="comments">
+					{% if page.comments %}
+					{% include comments.ext %}
+					{% endif %}
+				</section>
 				<div class="clearboth pagebottom"></div>
 			</div>
 			

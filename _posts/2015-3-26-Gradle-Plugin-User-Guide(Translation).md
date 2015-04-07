@@ -3,6 +3,7 @@ layout: post
 category: android
 title: Gradle插件用户指南(译)
 toc: true
+comments: true
 tagline: by Rinvay.T
 tags: [android, gradle]
 ---
