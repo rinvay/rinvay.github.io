@@ -1,0 +1,836 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	
+	<title>使用Gradle构建Android程序</title>
+	
+	
+	<meta name="author" content="Rinvay Tang">
+	
+	<link rel="stylesheet" href="/assets/themes/Snail/css/jquery.fancybox.css">
+	<link rel="stylesheet" href="/assets/themes/Snail/css/main.css">
+	<link rel="stylesheet" href="/assets/themes/Snail/css/pages/journal.css">
+	<link rel="stylesheet" href="/assets/themes/Snail/css/team.css">
+	<link rel="stylesheet" href="/assets/themes/Snail/css/static.css">
+	<link rel="stylesheet" href="/assets/themes/Snail/css/errors.css">
+	<link rel="stylesheet" href="/assets/themes/Snail/google-code-prettify/prettify.css">
+	
+	<link rel="shortcut icon" href="/assets/themes/Snail/img/favicon.ico">
+	
+	<script type="text/javascript" src="/assets/themes/Snail/js/jquery.min.js"></script>
+	
+	<script type="text/javascript" src="/assets/themes/Snail/js/auto_loadmore.js"></script>
+	
+	<script type="text/javascript" src="/assets/themes/Snail/google-code-prettify/prettify.js"></script>
+	
+	<script type="text/javascript">
+		$(function(){
+			$("pre code").addClass("prettyprint linenums");
+			prettyPrint();
+		});
+	</script>
+	
+<!--[if lt IE 9]>
+	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+	<!-- atom & rss feed -->
+	<link href="/atom.xml" type="application/atom+xml" rel="alternate" title="Sitewide ATOM Feed">
+	<link href="/rss.xml" type="application/rss+xml" rel="alternate" title="Sitewide RSS Feed">
+
+	
+	
+	<!-- for markdown toc use https://github.com/i5ting/i5ting_ztree_toc -->
+	<script src="/assets/js/jquery-1.4.4.min.js"> </script>
+	<script src="/assets/js/jquery.ztree.core-3.5.min.js"> </script>
+	<script src="/assets/js/ztree_toc.js"> </script>
+	<link rel="stylesheet" href="/assets/css/zTreeStyle/zTreeStyle.css" type="text/css">
+	<SCRIPT type="text/javascript" >
+		<!--
+		$(document).ready(function(){
+			$('#tree').ztree_toc({
+				documment_selector:'#page-content',
+				debug:false,
+				is_auto_number:false,
+
+				ztreeStyle: {
+					width:'25%',
+					height:'99%',
+					overflow: 'auto',
+					position: 'fixed',
+					'z-index': 2147483647,
+					border: '0px none',
+					left: '0px',
+					top: '0px',
+
+				}
+			});
+		});
+			//-->
+		</SCRIPT>
+
+		<style type="text/css">
+			#page-container {
+				margin-left: 25%;
+				width: 75%;
+			}
+
+			#toc_container {
+				margin-bottom: 10px;
+				overflow: hidden;
+			}
+
+			footer .footer-940 {
+				margin: 10px 10% 0 25%;				
+			}
+		</style>
+
+		
+
+	</head>
+	<body>
+		<noscript>
+			&amp;lt;div id="no-js"&amp;gt;Please enable JavaScript in your browser to experience / fully&amp;lt;/div&amp;gt;
+		</noscript>
+
+		<div id="page-container">
+			<div>
+				<nav>
+	<div id="nav-l">
+	</div>
+	<div id="nav-c">
+		<ul id="nav-list" style="width: 700px;">
+			<li id="home"><a href="/">Home</a></li>
+			
+			
+			
+				
+				  
+				
+			 
+				
+				  
+					
+					<li id = "About Me"><a href="/about.html">About Me</a></li>
+					
+				  
+				
+			 
+				
+				  
+					
+					<li id = "Archive"><a href="/archive.html">Archive</a></li>
+					
+				  
+				
+			 
+				
+				  
+				
+			 
+				
+				  
+					
+					<li id = "Categories"><a href="/categories.html">Categories</a></li>
+					
+				  
+				
+			 
+				
+			 
+				
+				  
+				
+			 
+				
+				  
+				
+			 
+				
+				  
+				
+			 
+				
+				  
+					
+					<li id = "Tags"><a href="/tags.html">Tags</a></li>
+					
+				  
+				
+			 
+			
+			
+		</ul>
+		<form id="nav-search" method="GET" action="/search.html">
+			<div id="search-right-pix">
+				<div id="search-left-pix">
+					<div id="search-center-pix">
+						<div id="search-icon-pix"></div>
+						<input name="query" type="text" placeholder="Search">
+					</div>
+				</div>
+			</div>
+		</form>
+		
+		
+	</div>
+	<div id="nav-r">
+	</div>
+</nav>
+				<div id="page-content">
+					
+<div id="page-content">
+	<div class="cont932">
+	<div id="journal-articles-block">
+		<div class="journal-article">
+			<div class="journal-post-info">
+				<div class="journal-cat-box">
+				
+				
+				<div class="journal-cat-box">
+
+<a href="/categories.html#android-ref" title="android">
+	android
+
+</a>
+</div>
+				
+				</div>
+			</div>
+			<div class="journal-body">
+				<h1 class="journal-title">使用Gradle构建Android程序<span class="author">by Rinvay.T</span>
+				</h1>
+				<span class="the-article">
+				<p>Android Studio正式版早已经发布了，默认使用Gradle构建，GitHub上80%的Android项目也都是使用Gradle构建的，我们还有什么理由不使用Gradle呢？</p>
+
+<h2 id="section">环境要求</h2>
+
+<ul>
+  <li>JDK <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">下载地址</a></li>
+  <li>Android SDK <a href="http://developer.android.com/sdk/index.html#Other">下载地址</a></li>
+  <li>Gradle <a href="http://gradle.org/">下载地址1</a><a href="http://services.gradle.org/distributions/">下载地址2</a>  </li>
+</ul>
+
+<p>给一个国内的下载地址：<a href="http://www.androiddevtools.cn/">AndroidDevTools</a></p>
+
+<!--more-->
+
+<h2 id="eclipse">开始(改造Eclipse项目)</h2>
+
+<p>eclipse可以直接用adt导出为gradle项目，android studio直接创建gradle项目。但是，我们还是有必要了解下手动改造，这让我们更清楚每个文件的作用。</p>
+
+<h3 id="section-1">独立项目构建</h3>
+
+<p>在我的另一篇博客<a href="http://rinvay.github.io/android/2015/03/26/Gradle-Plugin-User-Guide(Translation)/">Gradle插件用户指南(译)</a>中，3.1节可以看到，<br />
+一个最简单的build.gradle文件是这样的：</p>
+
+<pre><code>buildscript {
+    repositories {
+        jcenter()
+    }
+ 
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.1.0'
+    }
+}
+ 
+apply plugin: 'com.android.application'
+ 
+android {
+    compileSdkVersion 19
+    buildToolsVersion "22.0.1"
+}   
+</code></pre>
+
+<p>这里，要求项目目录结构是gradle的默认目录：</p>
+
+<pre><code>project-root  
+    |-src
+        |-main
+            |-java
+            |-res
+                |-drawable
+                |-layout
+                |-values
+            |-AndroidManifest.xml
+</code></pre>
+
+<p>如果是eclipse下的项目，需要配置下项目目录，修改后的build.gradle文件是这样的:</p>
+
+<pre><code>buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.1.0'
+    }
+}
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "22.0.1"
+
+    sourceSets {
+        main{
+            manifest.srcFile 'AndroidManifest.xml'
+
+            java.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+
+            res.srcDirs = ['res']
+
+            assets.srcDirs = ['assets']
+
+            jniLibs.srcDirs = ['libs']
+
+        }
+    }
+
+    dependencies {
+        compile fileTree(dir:'libs', include:['*.jar'])
+    }
+} 
+</code></pre>
+
+<p><strong>把这个build.gradle拷贝到项目根目录下，就可以使用gradle来构建你的app了。</strong></p>
+
+<p>打开终端/命令行，切换到项目根目录，运行<code>gradle assemble</code>，在<code>main-project/build/outputs/apk</code>下就可以看到生成的apk文件</p>
+
+<p><strong>Note:</strong> <br />
+要注意原项目的依赖，比如 ApiDemos ，是依赖support-v4的，要添加到dependencies中。  </p>
+
+<pre><code>compile 'com.android.support:support-v4:19.0.0'
+</code></pre>
+
+<h3 id="section-2">多项目构建</h3>
+
+<p>如果程序是由多个子工程构成的话，上面的build.gradle文件就不够用了。 </p>
+
+<p>假设你的项目目录是这样的</p>
+
+<pre><code>root
+    |-main-project
+    |-library-project1
+    |-library-project2
+</code></pre>
+
+<p>并且，依赖关系如下：</p>
+
+<pre><code>main-project -&gt; library-project1
+library-project1 -&gt; library-project2
+</code></pre>
+
+<p>那么，Gradle构建文件应该包含以下几个文件：</p>
+
+<pre><code>settings.gradle  
+build.gradle  
+main-project/build.gradle  
+library-project1/build.gradle  
+library-project2/build.gradle  
+</code></pre>
+
+<p>文件位置是这样：</p>
+
+<pre><code>root
+    |-main-project
+        |- ...
+        |-build.gradle
+    |-library-project1
+        |- ...
+        |-build.gradle
+    |-library-project2
+        |- ...
+        |-build.gradle
+    |-build.gradle
+    |-settings.gradle
+</code></pre>
+
+<p>文件内容如下： </p>
+
+<ul>
+  <li>
+    <p>settings.gradle:</p>
+
+    <pre><code>  include ':main-project','library-project1','library-project2'
+</code></pre>
+  </li>
+</ul>
+
+<p>settings.gradle声明了程序包含的子项目，如果子项目时包含在三级子目录下，例如<code>root/library/library-project1</code>，那么声明是这样的：</p>
+
+<pre><code>':library:library-project1'
+</code></pre>
+
+<ul>
+  <li>
+    <p>build.gradle:</p>
+
+    <pre><code>  buildscript {
+      repositories {
+          jcenter()
+      }
+      dependencies {
+          classpath 'com.android.tools.build:gradle:1.0.0'
+      }
+  }
+</code></pre>
+
+    <p>根目录下的buidle.gradle声明了项目的编译环境，指定了Android Gradle插件的版本。和上一个章节，那个单一的build.gradle的前半部分内容是一样的。</p>
+  </li>
+  <li>
+    <p>main-project/build.gradle:</p>
+
+    <pre><code>  apply plugin: 'com.android.application'
+    
+  android {
+      compileSdkVersion 19
+      buildToolsVersion "22.0.1"
+    
+      sourceSets {
+          main{
+              manifest.srcFile 'AndroidManifest.xml'
+    
+              java.srcDirs = ['src']
+              aidl.srcDirs = ['src']
+              renderscript.srcDirs = ['src']
+    
+              res.srcDirs = ['res']
+    
+              assets.srcDirs = ['assets']
+    
+              jniLibs.srcDirs = ['libs']
+    
+          }
+      }
+    
+      dependencies {
+          compile fileTree(dir:'libs', include:['*.jar'])
+          compile project(':library-project1')
+      }
+  } 
+</code></pre>
+  </li>
+</ul>
+
+<p>这个build.gradle的内容与上一章节build.gradle的后半部分基本一致，只是多了一个库项目依赖的声明。<br />
+这里假设目录结构和eclipse下的android项目目录结构是一样的，如果实际目录和gradle的默认目录结构一样，可以去掉<code>sourceSets{...}</code>部分</p>
+
+<ul>
+  <li>
+    <p>library-project1/build.gradle和main-project/build.gradle基本一致，只有两个地方不一样。</p>
+
+    <ul>
+      <li><code>apply plugin: 'com.android.application'</code>改成<code>apply plugin: 'com.android.library'</code></li>
+      <li><code>compile project(':library-project1')</code>改成<code>compile project(':library-project2')</code></li>
+    </ul>
+  </li>
+  <li>
+    <p>library-project1/build.gradle和library-project2/build.gradle基本一致，只有一个地方不一样。</p>
+
+    <ul>
+      <li>去掉<code>compile project(':library-project2')</code></li>
+    </ul>
+  </li>
+</ul>
+
+<p>至此，多项目的工程完成了gradle改造，可以在项目根目录下运行<code>gradle assemble</code>进行构建了。</p>
+
+<p>构建的其他细节，请参考我的另一篇博客<a href="http://rinvay.github.io/android/2015/03/26/Gradle-Plugin-User-Guide(Translation)/">Gradle插件用户指南(译)</a>。</p>
+
+<h3 id="gradle-wrapper">gradle wrapper</h3>
+
+<p>和Eclipse导出或者Android Studio创建的项目相比，我们改造完的项目还差了几个文件。<br />
+在项目根目录下，运行终端命令<code>gradle wrapper</code>，就会生成下面几个文件：</p>
+
+<pre><code>project-root
+    |-gradle
+        |-wrapper
+            |-gradle-wrapper.jar
+            |-gradle-wrapper.properties
+    |-gradlew
+    |-gradlew.bat
+</code></pre>
+
+<p><code>gradlew</code>, <code>gradlew.bat</code> 是支持多平台的gradle运行命令，如果运行时，发现系统没有对应版本的gradle，会通过<code>gradle-wrapper.jar</code>下载<code>gradle-wrapper.properties</code>中指定的gradle版本。这样的话，<strong>任何人获取代码后，不用安装gradle，就可以构建工程</strong>。  </p>
+
+<p>生成的<code>gradle-wrapper.properties</code>文件中指定的版本，就是运行<code>gradle wrapper</code>命令时的gradle版本。</p>
+
+<p>通过gradlew，可以执行gradle构建任务，例如：</p>
+
+<pre><code>./gradlew assemble      
+</code></pre>
+
+<h2 id="android-studio">使用Android Studio</h2>
+
+<p>Android Studio创建的项目默认使用Gradle构建，并且目录结构也是Gradle默认的。</p>
+
+<h3 id="android-studio--android-">使用Android Studio 创建 Android 项目</h3>
+
+<p>这个很简单，新建项目，按照引导一步一步往下走就行了。</p>
+
+<p>新建项目的结构如下：</p>
+
+<pre><code>project-root
+    |-app
+        |-src
+            |-androidTest
+            |-main
+                |-java
+                |-res
+                |-AndroidManifest.xml
+        |-build.gradle
+    |-gradle
+        |-wrapper
+            |-gradle-wrapper.jar
+            |-gradle-wrapper.properties
+    |-build.gradle
+    |-gradle.properties
+    |-gradlew
+    |-gradlew.bat
+    |-local.properties
+    |-settings.gradle
+</code></pre>
+
+<p><code>app</code><br />
+是项目代码和资源目录</p>
+
+<p><code>gradlew</code>,<code>gradlew.bat</code>,<code>gradle/wrapper</code><br />
+上一章节已经介绍过了</p>
+
+<p><code>build.gradle</code>,<code>settings.gradle</code><br />
+上一章节已经介绍过了</p>
+
+<p><code>gradle.properties</code><br />
+gradle运行的参数</p>
+
+<p><code>local.properties</code><br />
+本地环境参数，例如android sdk路径：sdk.dir</p>
+
+<h3 id="gradleandroid-studio">导入Gradle项目到Android Studio</h3>
+
+<p>对于非Android Studio项目，完成gradle改造后，可以导入到Android Studio中。</p>
+
+<pre><code>File -&gt; Open...  
+或者Android Studio启动页的  
+Open an existing Android Studio project
+</code></pre>
+
+<p>直接选择打开项目根目录下的settings.gradle(如果没有的话，打开build.gradle)文件，或者setting.gradle文件的父目录，结果如下图：  </p>
+
+<p><img src="/assets/images/import-from-gradle.png" alt="image" /></p>
+
+<p>如果运行过前面的<code>gradle wrapper</code>命令的话(或者是由eclipse导出的gradle项目)，目录下有<code>wrapper</code>文件夹，<code>Use default gradle wrapper(recommanded)</code>选项就是可选的，否则只能选择<code>Use local gradle distribution</code>。</p>
+
+<h2 id="section-3">混淆</h2>
+
+<h2 id="section-4">签名</h2>
+
+<h2 id="section-5">构建多渠道包</h2>
+
+<h3 id="androidmanifestxml">动态替换AndroidManifest.xml中的文本</h3>
+
+<p>以友盟为例，是通过在AndroidManifest.xml中添加<code>meta-data</code>标签来区分渠道：</p>
+
+<pre><code>&lt;meta-data
+    android:name="UMENG_CHANNEL"
+    android:value="official" /&gt;
+</code></pre>
+
+<p>不同的value值对应不同的渠道。</p>
+
+<p>android gradle plugin从0.13.0版本开始，productFlavor开始支持manifestPlaceHolder，我们使用这个就可以实现友盟的多渠道打包。</p>
+
+<ol>
+  <li>
+    <p>修改AndroidManifest.xml，添加placeHolder变量</p>
+
+    <pre><code> &lt;meta-data
+     android:name="UMENG_CHANNEL"
+     android:value="${channel_param}" /&gt;
+</code></pre>
+  </li>
+  <li>
+    <p>配置build.gradle文件</p>
+
+    <pre><code> android {
+     ...
+     defaultConfig {
+         ...
+         manifestPlaceholders = [channel_param: "official"]
+     }
+        
+     productFlavors {
+         channel1 {
+             ...
+         }
+         ...
+         channelN {
+             ...
+         }                
+     }
+        
+     productFlavors.all {
+         flavor -&gt; flavor.manifestPlaceholders = [channel_param: name]
+     }
+        
+ }    
+</code></pre>
+
+    <p><code>productFlavors.all</code>是合并的写法，也可以分开写：</p>
+
+    <pre><code> channel1 {
+     manifestPlaceholder = [channel_param:name]
+ }
+</code></pre>
+  </li>
+</ol>
+
+<p>再进一步，国内的应用商店可以说数以百计，如果每个都在build.gradle文件里写一个flavor，那么build.gradle文件就会变得冗长。<br />
+我们把渠道号写到一个单独的文件里<code>channels.txt</code>，内容如下：</p>
+
+<pre><code>channel-360
+channel-baidu
+</code></pre>
+
+<p>然后在build.gradle里定义函数<code>flavors()</code>，作用就是根据<code>channels.txt</code>里的内容动态创建productFlavor，然后在build.gradle中调用这个函数，优化后的结果是这样：</p>
+
+<pre><code>android {
+    ...
+    defaultConfig {
+        ... 
+        manifestPlaceholders = [channel_param: "official"]
+    }
+
+    flavors()
+}
+
+def flavors() {
+    def path = './channels.txt' //channels.txt的路径
+    file(path).eachLine {
+        line -&gt;
+        if(!line.startsWith("//")) {
+            //动态创建productFlavor
+            android.productFlavors.create(line, {
+                manifestPlaceholders = [channel_param: name]
+            })
+
+        }
+    }
+}
+</code></pre>
+
+<p>在Android Studio中，点击<code>Sync Project with Gradle Files</code>，</p>
+
+
+				</span>
+				<div class="journal-date">Published 09 April 2015</div>
+				<div class="journal-tags">
+				
+				
+	 
+		<a class="tag-cont" href="/tags.html#android-ref">
+			<div class="tag-l"></div>
+			<div class="tag-c">android</div>
+			<div class="tag-r"></div>
+		</a>
+	 
+		<a class="tag-cont" href="/tags.html#gradle-ref">
+			<div class="tag-l"></div>
+			<div class="tag-c">gradle</div>
+			<div class="tag-r"></div>
+		</a>
+	
+
+
+
+				</div>
+			</div>
+		</div>
+		<div class="clearboth"></div>
+	</div>
+</div>
+	<div class="clearboth"></div>
+	
+	<div class="clearboth"></div>
+</div>
+
+				</div>
+				<section class="comments">
+					
+					<div id="disqus_thread"></div>
+ <script type="text/javascript">
+     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+     var disqus_shortname = 'rinvayblog'; // required: replace example with your forum shortname
+
+     /* * * DON'T EDIT BELOW THIS LINE * * */
+     (function() {
+         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+ </script>
+ <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    
+
+					
+				</section>
+				<div class="clearboth pagebottom"></div>
+			</div>
+			
+
+			
+<style type="text/css">
+
+	#cnzz a {
+		font-size: 14px;
+		font-weight: 700;
+		line-height: 1.6em;
+	}
+</style>
+
+<footer>
+	<div class="footer-940">
+		<div class="footer-general-info">
+			© 2015 Rinvay Tang.<br><br>
+			Content licensed under:<br>
+			<a class="cc" href="http://creativecommons.org/licenses/by-sa/3.0/">c a b</a><br>
+			<a href = "/about.html">About Me</a><br>
+		</div>
+		<div class="footer-col-cont">
+			<div class="footer-nav-col">
+				<h4><a>Categories</a></h4>
+				<ul>
+					
+					
+
+
+  
+     
+    	<li><a href="/categories.html#android-ref">
+    		android <span>2</span>
+    	</a></li>
+    
+  
+
+
+				</ul>
+			</div>
+			<div class="footer-nav-col">
+				<h4><a>Pages</a></h4>
+				<ul>
+					
+					
+					
+
+
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/about.html">About Me</a></li>
+      	
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/archive.html">Archive</a></li>
+      	
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/categories.html">Categories</a></li>
+      	
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+      	
+      	<li><a href="/tags.html">Tags</a></li>
+      	
+      
+    
+  
+
+
+
+				</ul>
+			</div>
+			<div class="footer-nav-col">
+				<h4><a>Feed</a></h4>
+				<ul>
+					<li><a href="/atom.xml">Atom Feed</a></li>
+					<li><a href="/rss.xml">RSS Feed</a></li>
+				</ul>
+			</div>
+			<div class="footer-nav-col">
+				<h4><a>Links</a></h4>
+				<ul>
+					 
+					<li><a href = "http://rinvay.github.io/">Rinvay's Blog</a></li>
+					
+				</ul>
+			</div>
+			<div class="footer-nav-col">
+				<h4><a href = "/about.html">About Me</a></h4>
+				<ul>
+					
+				</ul>
+			</div>
+			<div id="cnzz">
+				<!-- cnzz统计 -->
+				<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1254722935'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/stat.php%3Fid%3D1254722935' type='text/javascript'%3E%3C/script%3E"));</script>
+			</div>
+			<div class="clearboth"></div>
+		</div>
+		<div class="clearboth"></div>
+	</div>
+	<div class="clearboth"></div>
+</footer>
+			
+
+		</div>
+
+		<div id="toc_container" style='width:25%;'>
+			<ul id="tree" class="ztree" style='width:100%'>
+
+			</ul>
+		</div>
+	</body>
+	</html>
+
+

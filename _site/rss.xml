@@ -5,10 +5,442 @@
         <description>Rinvay's Blog - Rinvay Tang</description>
         <link>http://rinvay.github.io</link>
         <link>http://rinvay.github.io</link>
-        <lastBuildDate>2015-04-07T22:44:35+08:00</lastBuildDate>
-        <pubDate>2015-04-07T22:44:35+08:00</pubDate>
+        <lastBuildDate>2015-04-09T11:46:47+08:00</lastBuildDate>
+        <pubDate>2015-04-09T11:46:47+08:00</pubDate>
         <ttl>1800</ttl>
 
+
+        <item>
+                <title>使用Gradle构建Android程序</title>
+                <description>&lt;p&gt;Android Studio正式版早已经发布了，默认使用Gradle构建，GitHub上80%的Android项目也都是使用Gradle构建的，我们还有什么理由不使用Gradle呢？&lt;/p&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;环境要求&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;JDK &lt;a href=&quot;http://www.oracle.com/technetwork/java/javase/downloads/index.html&quot;&gt;下载地址&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;Android SDK &lt;a href=&quot;http://developer.android.com/sdk/index.html#Other&quot;&gt;下载地址&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;Gradle &lt;a href=&quot;http://gradle.org/&quot;&gt;下载地址1&lt;/a&gt;&lt;a href=&quot;http://services.gradle.org/distributions/&quot;&gt;下载地址2&lt;/a&gt;  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;给一个国内的下载地址：&lt;a href=&quot;http://www.androiddevtools.cn/&quot;&gt;AndroidDevTools&lt;/a&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;eclipse&quot;&gt;开始(改造Eclipse项目)&lt;/h2&gt;
+
+&lt;p&gt;eclipse可以直接用adt导出为gradle项目，android studio直接创建gradle项目。但是，我们还是有必要了解下手动改造，这让我们更清楚每个文件的作用。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;独立项目构建&lt;/h3&gt;
+
+&lt;p&gt;在我的另一篇博客&lt;a href=&quot;http://rinvay.github.io/android/2015/03/26/Gradle-Plugin-User-Guide(Translation)/&quot;&gt;Gradle插件用户指南(译)&lt;/a&gt;中，3.1节可以看到，&lt;br /&gt;
+一个最简单的build.gradle文件是这样的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;buildscript {
+    repositories {
+        jcenter()
+    }
+ 
+    dependencies {
+        classpath &#39;com.android.tools.build:gradle:1.1.0&#39;
+    }
+}
+ 
+apply plugin: &#39;com.android.application&#39;
+ 
+android {
+    compileSdkVersion 19
+    buildToolsVersion &quot;22.0.1&quot;
+}   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里，要求项目目录结构是gradle的默认目录：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;project-root  
+    |-src
+        |-main
+            |-java
+            |-res
+                |-drawable
+                |-layout
+                |-values
+            |-AndroidManifest.xml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如果是eclipse下的项目，需要配置下项目目录，修改后的build.gradle文件是这样的:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath &#39;com.android.tools.build:gradle:1.1.0&#39;
+    }
+}
+
+apply plugin: &#39;com.android.application&#39;
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion &quot;22.0.1&quot;
+
+    sourceSets {
+        main{
+            manifest.srcFile &#39;AndroidManifest.xml&#39;
+
+            java.srcDirs = [&#39;src&#39;]
+            aidl.srcDirs = [&#39;src&#39;]
+            renderscript.srcDirs = [&#39;src&#39;]
+
+            res.srcDirs = [&#39;res&#39;]
+
+            assets.srcDirs = [&#39;assets&#39;]
+
+            jniLibs.srcDirs = [&#39;libs&#39;]
+
+        }
+    }
+
+    dependencies {
+        compile fileTree(dir:&#39;libs&#39;, include:[&#39;*.jar&#39;])
+    }
+} 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;把这个build.gradle拷贝到项目根目录下，就可以使用gradle来构建你的app了。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;打开终端/命令行，切换到项目根目录，运行&lt;code&gt;gradle assemble&lt;/code&gt;，在&lt;code&gt;main-project/build/outputs/apk&lt;/code&gt;下就可以看到生成的apk文件&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; &lt;br /&gt;
+要注意原项目的依赖，比如 ApiDemos ，是依赖support-v4的，要添加到dependencies中。  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;compile &#39;com.android.support:support-v4:19.0.0&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;多项目构建&lt;/h3&gt;
+
+&lt;p&gt;如果程序是由多个子工程构成的话，上面的build.gradle文件就不够用了。 &lt;/p&gt;
+
+&lt;p&gt;假设你的项目目录是这样的&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;root
+    |-main-project
+    |-library-project1
+    |-library-project2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;并且，依赖关系如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;main-project -&amp;gt; library-project1
+library-project1 -&amp;gt; library-project2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;那么，Gradle构建文件应该包含以下几个文件：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;settings.gradle  
+build.gradle  
+main-project/build.gradle  
+library-project1/build.gradle  
+library-project2/build.gradle  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;文件位置是这样：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;root
+    |-main-project
+        |- ...
+        |-build.gradle
+    |-library-project1
+        |- ...
+        |-build.gradle
+    |-library-project2
+        |- ...
+        |-build.gradle
+    |-build.gradle
+    |-settings.gradle
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;文件内容如下： &lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;settings.gradle:&lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  include &#39;:main-project&#39;,&#39;library-project1&#39;,&#39;library-project2&#39;
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;settings.gradle声明了程序包含的子项目，如果子项目时包含在三级子目录下，例如&lt;code&gt;root/library/library-project1&lt;/code&gt;，那么声明是这样的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&#39;:library:library-project1&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;build.gradle:&lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  buildscript {
+      repositories {
+          jcenter()
+      }
+      dependencies {
+          classpath &#39;com.android.tools.build:gradle:1.0.0&#39;
+      }
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+    &lt;p&gt;根目录下的buidle.gradle声明了项目的编译环境，指定了Android Gradle插件的版本。和上一个章节，那个单一的build.gradle的前半部分内容是一样的。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;main-project/build.gradle:&lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;  apply plugin: &#39;com.android.application&#39;
+    
+  android {
+      compileSdkVersion 19
+      buildToolsVersion &quot;22.0.1&quot;
+    
+      sourceSets {
+          main{
+              manifest.srcFile &#39;AndroidManifest.xml&#39;
+    
+              java.srcDirs = [&#39;src&#39;]
+              aidl.srcDirs = [&#39;src&#39;]
+              renderscript.srcDirs = [&#39;src&#39;]
+    
+              res.srcDirs = [&#39;res&#39;]
+    
+              assets.srcDirs = [&#39;assets&#39;]
+    
+              jniLibs.srcDirs = [&#39;libs&#39;]
+    
+          }
+      }
+    
+      dependencies {
+          compile fileTree(dir:&#39;libs&#39;, include:[&#39;*.jar&#39;])
+          compile project(&#39;:library-project1&#39;)
+      }
+  } 
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个build.gradle的内容与上一章节build.gradle的后半部分基本一致，只是多了一个库项目依赖的声明。&lt;br /&gt;
+这里假设目录结构和eclipse下的android项目目录结构是一样的，如果实际目录和gradle的默认目录结构一样，可以去掉&lt;code&gt;sourceSets{...}&lt;/code&gt;部分&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;library-project1/build.gradle和main-project/build.gradle基本一致，只有两个地方不一样。&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li&gt;&lt;code&gt;apply plugin: &#39;com.android.application&#39;&lt;/code&gt;改成&lt;code&gt;apply plugin: &#39;com.android.library&#39;&lt;/code&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;code&gt;compile project(&#39;:library-project1&#39;)&lt;/code&gt;改成&lt;code&gt;compile project(&#39;:library-project2&#39;)&lt;/code&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;library-project1/build.gradle和library-project2/build.gradle基本一致，只有一个地方不一样。&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li&gt;去掉&lt;code&gt;compile project(&#39;:library-project2&#39;)&lt;/code&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;至此，多项目的工程完成了gradle改造，可以在项目根目录下运行&lt;code&gt;gradle assemble&lt;/code&gt;进行构建了。&lt;/p&gt;
+
+&lt;p&gt;构建的其他细节，请参考我的另一篇博客&lt;a href=&quot;http://rinvay.github.io/android/2015/03/26/Gradle-Plugin-User-Guide(Translation)/&quot;&gt;Gradle插件用户指南(译)&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h3 id=&quot;gradle-wrapper&quot;&gt;gradle wrapper&lt;/h3&gt;
+
+&lt;p&gt;和Eclipse导出或者Android Studio创建的项目相比，我们改造完的项目还差了几个文件。&lt;br /&gt;
+在项目根目录下，运行终端命令&lt;code&gt;gradle wrapper&lt;/code&gt;，就会生成下面几个文件：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;project-root
+    |-gradle
+        |-wrapper
+            |-gradle-wrapper.jar
+            |-gradle-wrapper.properties
+    |-gradlew
+    |-gradlew.bat
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;gradlew&lt;/code&gt;, &lt;code&gt;gradlew.bat&lt;/code&gt; 是支持多平台的gradle运行命令，如果运行时，发现系统没有对应版本的gradle，会通过&lt;code&gt;gradle-wrapper.jar&lt;/code&gt;下载&lt;code&gt;gradle-wrapper.properties&lt;/code&gt;中指定的gradle版本。这样的话，&lt;strong&gt;任何人获取代码后，不用安装gradle，就可以构建工程&lt;/strong&gt;。  &lt;/p&gt;
+
+&lt;p&gt;生成的&lt;code&gt;gradle-wrapper.properties&lt;/code&gt;文件中指定的版本，就是运行&lt;code&gt;gradle wrapper&lt;/code&gt;命令时的gradle版本。&lt;/p&gt;
+
+&lt;p&gt;通过gradlew，可以执行gradle构建任务，例如：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;./gradlew assemble      
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;android-studio&quot;&gt;使用Android Studio&lt;/h2&gt;
+
+&lt;p&gt;Android Studio创建的项目默认使用Gradle构建，并且目录结构也是Gradle默认的。&lt;/p&gt;
+
+&lt;h3 id=&quot;android-studio--android-&quot;&gt;使用Android Studio 创建 Android 项目&lt;/h3&gt;
+
+&lt;p&gt;这个很简单，新建项目，按照引导一步一步往下走就行了。&lt;/p&gt;
+
+&lt;p&gt;新建项目的结构如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;project-root
+    |-app
+        |-src
+            |-androidTest
+            |-main
+                |-java
+                |-res
+                |-AndroidManifest.xml
+        |-build.gradle
+    |-gradle
+        |-wrapper
+            |-gradle-wrapper.jar
+            |-gradle-wrapper.properties
+    |-build.gradle
+    |-gradle.properties
+    |-gradlew
+    |-gradlew.bat
+    |-local.properties
+    |-settings.gradle
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;app&lt;/code&gt;&lt;br /&gt;
+是项目代码和资源目录&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;gradlew&lt;/code&gt;,&lt;code&gt;gradlew.bat&lt;/code&gt;,&lt;code&gt;gradle/wrapper&lt;/code&gt;&lt;br /&gt;
+上一章节已经介绍过了&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;build.gradle&lt;/code&gt;,&lt;code&gt;settings.gradle&lt;/code&gt;&lt;br /&gt;
+上一章节已经介绍过了&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;gradle.properties&lt;/code&gt;&lt;br /&gt;
+gradle运行的参数&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;local.properties&lt;/code&gt;&lt;br /&gt;
+本地环境参数，例如android sdk路径：sdk.dir&lt;/p&gt;
+
+&lt;h3 id=&quot;gradleandroid-studio&quot;&gt;导入Gradle项目到Android Studio&lt;/h3&gt;
+
+&lt;p&gt;对于非Android Studio项目，完成gradle改造后，可以导入到Android Studio中。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;File -&amp;gt; Open...  
+或者Android Studio启动页的  
+Open an existing Android Studio project
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;直接选择打开项目根目录下的settings.gradle(如果没有的话，打开build.gradle)文件，或者setting.gradle文件的父目录，结果如下图：  &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/import-from-gradle.png&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;如果运行过前面的&lt;code&gt;gradle wrapper&lt;/code&gt;命令的话(或者是由eclipse导出的gradle项目)，目录下有&lt;code&gt;wrapper&lt;/code&gt;文件夹，&lt;code&gt;Use default gradle wrapper(recommanded)&lt;/code&gt;选项就是可选的，否则只能选择&lt;code&gt;Use local gradle distribution&lt;/code&gt;。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-3&quot;&gt;混淆&lt;/h2&gt;
+
+&lt;h2 id=&quot;section-4&quot;&gt;签名&lt;/h2&gt;
+
+&lt;h2 id=&quot;section-5&quot;&gt;构建多渠道包&lt;/h2&gt;
+
+&lt;h3 id=&quot;androidmanifestxml&quot;&gt;动态替换AndroidManifest.xml中的文本&lt;/h3&gt;
+
+&lt;p&gt;以友盟为例，是通过在AndroidManifest.xml中添加&lt;code&gt;meta-data&lt;/code&gt;标签来区分渠道：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;meta-data
+    android:name=&quot;UMENG_CHANNEL&quot;
+    android:value=&quot;official&quot; /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;不同的value值对应不同的渠道。&lt;/p&gt;
+
+&lt;p&gt;android gradle plugin从0.13.0版本开始，productFlavor开始支持manifestPlaceHolder，我们使用这个就可以实现友盟的多渠道打包。&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;修改AndroidManifest.xml，添加placeHolder变量&lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt; &amp;lt;meta-data
+     android:name=&quot;UMENG_CHANNEL&quot;
+     android:value=&quot;${channel_param}&quot; /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;配置build.gradle文件&lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt; android {
+     ...
+     defaultConfig {
+         ...
+         manifestPlaceholders = [channel_param: &quot;official&quot;]
+     }
+        
+     productFlavors {
+         channel1 {
+             ...
+         }
+         ...
+         channelN {
+             ...
+         }                
+     }
+        
+     productFlavors.all {
+         flavor -&amp;gt; flavor.manifestPlaceholders = [channel_param: name]
+     }
+        
+ }    
+&lt;/code&gt;&lt;/pre&gt;
+
+    &lt;p&gt;&lt;code&gt;productFlavors.all&lt;/code&gt;是合并的写法，也可以分开写：&lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt; channel1 {
+     manifestPlaceholder = [channel_param:name]
+ }
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;再进一步，国内的应用商店可以说数以百计，如果每个都在build.gradle文件里写一个flavor，那么build.gradle文件就会变得冗长。&lt;br /&gt;
+我们把渠道号写到一个单独的文件里&lt;code&gt;channels.txt&lt;/code&gt;，内容如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;channel-360
+channel-baidu
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后在build.gradle里定义函数&lt;code&gt;flavors()&lt;/code&gt;，作用就是根据&lt;code&gt;channels.txt&lt;/code&gt;里的内容动态创建productFlavor，然后在build.gradle中调用这个函数，优化后的结果是这样：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    ...
+    defaultConfig {
+        ... 
+        manifestPlaceholders = [channel_param: &quot;official&quot;]
+    }
+
+    flavors()
+}
+
+def flavors() {
+    def path = &#39;./channels.txt&#39; //channels.txt的路径
+    file(path).eachLine {
+        line -&amp;gt;
+        if(!line.startsWith(&quot;//&quot;)) {
+            //动态创建productFlavor
+            android.productFlavors.create(line, {
+                manifestPlaceholders = [channel_param: name]
+            })
+
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在Android Studio中，点击&lt;code&gt;Sync Project with Gradle Files&lt;/code&gt;，&lt;/p&gt;
+
+</description>
+                <link>http://rinvay.github.io/android/2015/04/09/Build-Android-with-Gradle</link>
+                <guid>http://rinvay.github.io/android/2015/04/09/Build-Android-with-Gradle</guid>
+                <pubDate>2015-04-09T00:00:00+08:00</pubDate>
+        </item>
 
         <item>
                 <title>Gradle插件用户指南(译)</title>
@@ -32,6 +464,8 @@ samples see bottom of &lt;a href=&quot;http://tools.android.com/tech-docs/new-bu
   &lt;li&gt;使得配置，扩展和自定义构建更加容易&lt;/li&gt;
   &lt;li&gt;良好的IDE集成&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;!--more--&gt;
 
 &lt;h3 id=&quot;gradle&quot;&gt;1.2 为什么使用Gradle&lt;/h3&gt;
 
