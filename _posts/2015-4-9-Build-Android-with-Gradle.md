@@ -305,9 +305,10 @@ gradle运行的参数
 
 如果运行过前面的`gradle wrapper`命令的话(或者是由eclipse导出的gradle项目)，目录下有`wrapper`文件夹，`Use default gradle wrapper(recommanded)`选项就是可选的，否则只能选择`Use local gradle distribution`。
 
-## 混淆
+## 混淆与签名
 
-## 签名
+请看我另一篇博客 [Gradle插件用户指南(译)](http://rinvay.github.io/android/2015/03/26/Gradle-Plugin-User-Guide\(Translation\)/#1090403) 3.4.3节和3.4.4节
+
 
 ## 构建多渠道包
 

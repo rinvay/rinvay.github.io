@@ -5,8 +5,8 @@
         <description>Rinvay's Blog - Rinvay Tang</description>
         <link>http://rinvay.github.io</link>
         <link>http://rinvay.github.io</link>
-        <lastBuildDate>2015-04-09T11:46:47+08:00</lastBuildDate>
-        <pubDate>2015-04-09T11:46:47+08:00</pubDate>
+        <lastBuildDate>2015-04-09T14:08:27+08:00</lastBuildDate>
+        <pubDate>2015-04-09T14:08:27+08:00</pubDate>
         <ttl>1800</ttl>
 
 
@@ -336,11 +336,11 @@ Open an existing Android Studio project
 
 &lt;p&gt;如果运行过前面的&lt;code&gt;gradle wrapper&lt;/code&gt;命令的话(或者是由eclipse导出的gradle项目)，目录下有&lt;code&gt;wrapper&lt;/code&gt;文件夹，&lt;code&gt;Use default gradle wrapper(recommanded)&lt;/code&gt;选项就是可选的，否则只能选择&lt;code&gt;Use local gradle distribution&lt;/code&gt;。&lt;/p&gt;
 
-&lt;h2 id=&quot;section-3&quot;&gt;混淆&lt;/h2&gt;
+&lt;h2 id=&quot;section-3&quot;&gt;混淆与签名&lt;/h2&gt;
 
-&lt;h2 id=&quot;section-4&quot;&gt;签名&lt;/h2&gt;
+&lt;p&gt;请看我另一篇博客 &lt;a href=&quot;http://rinvay.github.io/android/2015/03/26/Gradle-Plugin-User-Guide\(Translation\)/#1090403&quot;&gt;Gradle插件用户指南(译)&lt;/a&gt; 3.4.3节和3.4.4节&lt;/p&gt;
 
-&lt;h2 id=&quot;section-5&quot;&gt;构建多渠道包&lt;/h2&gt;
+&lt;h2 id=&quot;section-4&quot;&gt;构建多渠道包&lt;/h2&gt;
 
 &lt;h3 id=&quot;androidmanifestxml&quot;&gt;动态替换AndroidManifest.xml中的文本&lt;/h3&gt;
 
