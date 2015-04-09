@@ -101,6 +101,8 @@ eclipse可以直接用adt导出为gradle项目，android studio直接创建gradl
         }
     } 
 
+与前面的build.gradle相比，只增加了`sourceSets{...}`块，在里面指定了对应的文件目录。
+
 **把这个build.gradle拷贝到项目根目录下，就可以使用gradle来构建你的app了。**
 
 打开终端/命令行，切换到项目根目录，运行`gradle assemble`，在`main-project/build/outputs/apk`下就可以看到生成的apk文件
@@ -161,7 +163,7 @@ eclipse可以直接用adt导出为gradle项目，android studio直接创建gradl
     
 settings.gradle声明了程序包含的子项目，如果子项目时包含在三级子目录下，例如`root/library/library-project1`，那么声明是这样的：
 
-    ':library:library-project1'
+        ':library:library-project1'
 
 
 - build.gradle:
@@ -238,13 +240,21 @@ settings.gradle声明了程序包含的子项目，如果子项目时包含在�
         |-gradlew
         |-gradlew.bat
 
-`gradlew`, `gradlew.bat` 是支持多平台的gradle运行命令，如果运行时，发现系统没有对应版本的gradle，会通过`gradle-wrapper.jar`下载`gradle-wrapper.properties`中指定的gradle版本。这样的话，**任何人获取代码后，不用安装gradle，就可以构建工程**。  
-
-生成的`gradle-wrapper.properties`文件中指定的版本，就是运行`gradle wrapper`命令时的gradle版本。
-
-通过gradlew，可以执行gradle构建任务，例如：
+`gradlew`, `gradlew.bat` 是支持多平台的gradle运行命令，通过gradlew，可以执行gradle构建任务，例如：
 
     ./gradlew assemble      
+
+如果运行时，发现系统没有对应版本的gradle，会通过`gradle-wrapper.jar`下载`gradle-wrapper.properties`中指定的gradle版本。这样的话，  
+**任何人获取代码后，不用安装gradle，就可以构建工程**。  
+
+`gradle-wrapper.properties`文件中指定的版本，就是运行`gradle wrapper`命令时的gradle版本。  
+当然，也可以手动指定别的版本，在根目录下build.gradle文件中添加:
+
+    task wrapper(type: Wrapper) {
+        gradleVersion = '2.3'
+    }
+
+再运行`gradle wrapper`。
 
 ## 使用Android Studio
 

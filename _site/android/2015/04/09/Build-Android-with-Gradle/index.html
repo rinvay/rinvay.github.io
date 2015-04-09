@@ -298,6 +298,8 @@ android {
 } 
 </code></pre>
 
+<p>与前面的build.gradle相比，只增加了<code>sourceSets{...}</code>块，在里面指定了对应的文件目录。</p>
+
 <p><strong>把这个build.gradle拷贝到项目根目录下，就可以使用gradle来构建你的app了。</strong></p>
 
 <p>打开终端/命令行，切换到项目根目录，运行<code>gradle assemble</code>，在<code>main-project/build/outputs/apk</code>下就可以看到生成的apk文件</p>
@@ -364,7 +366,7 @@ library-project2/build.gradle
 
 <p>settings.gradle声明了程序包含的子项目，如果子项目时包含在三级子目录下，例如<code>root/library/library-project1</code>，那么声明是这样的：</p>
 
-<pre><code>':library:library-project1'
+<pre><code>    ':library:library-project1'
 </code></pre>
 
 <ul>
@@ -457,14 +459,23 @@ library-project2/build.gradle
     |-gradlew.bat
 </code></pre>
 
-<p><code>gradlew</code>, <code>gradlew.bat</code> 是支持多平台的gradle运行命令，如果运行时，发现系统没有对应版本的gradle，会通过<code>gradle-wrapper.jar</code>下载<code>gradle-wrapper.properties</code>中指定的gradle版本。这样的话，<strong>任何人获取代码后，不用安装gradle，就可以构建工程</strong>。  </p>
-
-<p>生成的<code>gradle-wrapper.properties</code>文件中指定的版本，就是运行<code>gradle wrapper</code>命令时的gradle版本。</p>
-
-<p>通过gradlew，可以执行gradle构建任务，例如：</p>
+<p><code>gradlew</code>, <code>gradlew.bat</code> 是支持多平台的gradle运行命令，通过gradlew，可以执行gradle构建任务，例如：</p>
 
 <pre><code>./gradlew assemble      
 </code></pre>
+
+<p>如果运行时，发现系统没有对应版本的gradle，会通过<code>gradle-wrapper.jar</code>下载<code>gradle-wrapper.properties</code>中指定的gradle版本。这样的话，<br />
+<strong>任何人获取代码后，不用安装gradle，就可以构建工程</strong>。  </p>
+
+<p><code>gradle-wrapper.properties</code>文件中指定的版本，就是运行<code>gradle wrapper</code>命令时的gradle版本。<br />
+当然，也可以手动指定别的版本，在根目录下build.gradle文件中添加:</p>
+
+<pre><code>task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
+</code></pre>
+
+<p>再运行<code>gradle wrapper</code>。</p>
 
 <h2 id="android-studio">使用Android Studio</h2>
 

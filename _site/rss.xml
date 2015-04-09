@@ -5,8 +5,8 @@
         <description>Rinvay's Blog - Rinvay Tang</description>
         <link>http://rinvay.github.io</link>
         <link>http://rinvay.github.io</link>
-        <lastBuildDate>2015-04-09T14:18:02+08:00</lastBuildDate>
-        <pubDate>2015-04-09T14:18:02+08:00</pubDate>
+        <lastBuildDate>2015-04-09T22:50:07+08:00</lastBuildDate>
+        <pubDate>2015-04-09T22:50:07+08:00</pubDate>
         <ttl>1800</ttl>
 
 
@@ -107,6 +107,8 @@ android {
 } 
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;p&gt;与前面的build.gradle相比，只增加了&lt;code&gt;sourceSets{...}&lt;/code&gt;块，在里面指定了对应的文件目录。&lt;/p&gt;
+
 &lt;p&gt;&lt;strong&gt;把这个build.gradle拷贝到项目根目录下，就可以使用gradle来构建你的app了。&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;打开终端/命令行，切换到项目根目录，运行&lt;code&gt;gradle assemble&lt;/code&gt;，在&lt;code&gt;main-project/build/outputs/apk&lt;/code&gt;下就可以看到生成的apk文件&lt;/p&gt;
@@ -173,7 +175,7 @@ library-project2/build.gradle
 
 &lt;p&gt;settings.gradle声明了程序包含的子项目，如果子项目时包含在三级子目录下，例如&lt;code&gt;root/library/library-project1&lt;/code&gt;，那么声明是这样的：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;&#39;:library:library-project1&#39;
+&lt;pre&gt;&lt;code&gt;    &#39;:library:library-project1&#39;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;ul&gt;
@@ -266,14 +268,23 @@ library-project2/build.gradle
     |-gradlew.bat
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;code&gt;gradlew&lt;/code&gt;, &lt;code&gt;gradlew.bat&lt;/code&gt; 是支持多平台的gradle运行命令，如果运行时，发现系统没有对应版本的gradle，会通过&lt;code&gt;gradle-wrapper.jar&lt;/code&gt;下载&lt;code&gt;gradle-wrapper.properties&lt;/code&gt;中指定的gradle版本。这样的话，&lt;strong&gt;任何人获取代码后，不用安装gradle，就可以构建工程&lt;/strong&gt;。  &lt;/p&gt;
-
-&lt;p&gt;生成的&lt;code&gt;gradle-wrapper.properties&lt;/code&gt;文件中指定的版本，就是运行&lt;code&gt;gradle wrapper&lt;/code&gt;命令时的gradle版本。&lt;/p&gt;
-
-&lt;p&gt;通过gradlew，可以执行gradle构建任务，例如：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;gradlew&lt;/code&gt;, &lt;code&gt;gradlew.bat&lt;/code&gt; 是支持多平台的gradle运行命令，通过gradlew，可以执行gradle构建任务，例如：&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;./gradlew assemble      
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如果运行时，发现系统没有对应版本的gradle，会通过&lt;code&gt;gradle-wrapper.jar&lt;/code&gt;下载&lt;code&gt;gradle-wrapper.properties&lt;/code&gt;中指定的gradle版本。这样的话，&lt;br /&gt;
+&lt;strong&gt;任何人获取代码后，不用安装gradle，就可以构建工程&lt;/strong&gt;。  &lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;gradle-wrapper.properties&lt;/code&gt;文件中指定的版本，就是运行&lt;code&gt;gradle wrapper&lt;/code&gt;命令时的gradle版本。&lt;br /&gt;
+当然，也可以手动指定别的版本，在根目录下build.gradle文件中添加:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;task wrapper(type: Wrapper) {
+    gradleVersion = &#39;2.3&#39;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再运行&lt;code&gt;gradle wrapper&lt;/code&gt;。&lt;/p&gt;
 
 &lt;h2 id=&quot;android-studio&quot;&gt;使用Android Studio&lt;/h2&gt;
 
