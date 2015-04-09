@@ -4,7 +4,7 @@
  <title>Rinvay's Blog</title>
  <link href="http://rinvay.github.io/" rel="self"/>
  <link href="http://rinvay.github.io"/>
- <updated>2015-04-09T14:08:27+08:00</updated>
+ <updated>2015-04-09T14:18:02+08:00</updated>
  <id>http://rinvay.github.io</id>
  <author>
    <name>Rinvay Tang</name>
@@ -439,7 +439,8 @@ def flavors() {
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;在Android Studio中，点击&lt;code&gt;Sync Project with Gradle Files&lt;/code&gt;，&lt;/p&gt;
+&lt;p&gt;在Android Studio中，点击&lt;code&gt;Sync Project with Gradle Files&lt;/code&gt;，就可以在Gradle窗口中看到相应的渠道构建任务了&lt;br /&gt;
+&lt;img src=&quot;/assets/images/dynamic-product-flavors.png&quot; alt=&quot;image&quot; /&gt;&lt;/p&gt;
 
 </content>
  </entry>

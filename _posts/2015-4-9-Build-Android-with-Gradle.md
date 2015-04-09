@@ -395,7 +395,8 @@ android gradle plugin从0.13.0版本开始，productFlavor开始支持manifestPl
         }
     }
 
-在Android Studio中，点击`Sync Project with Gradle Files`，
+在Android Studio中，点击`Sync Project with Gradle Files`，就可以在Gradle窗口中看到相应的渠道构建任务了  
+![image](/assets/images/dynamic-product-flavors.png)
 
 [0]:http://www.oracle.com/technetwork/java/javase/downloads/index.html
 [1]:http://developer.android.com/sdk/index.html#Other
